@@ -1,0 +1,13 @@
+//
+// Copyright © 2022 Surya Software Systems Pvt. Ltd.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+
+
+#include "Pods/Target Support Files/Pods-Flickr-App/Pods-Flickr-App.prod-debug.xcconfig"
+#include "Flickr-App/Configs/Prod/Prod.xcconfig"
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = PROD DEBUG

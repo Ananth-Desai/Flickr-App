@@ -1,0 +1,26 @@
+name: 'Test project'
+description: 'Tests project on simulators based on the input configuration'
+inputs:
+  destination:
+    description: 'platform=<Platform on which the code should run>,OS=<iOS version number>,name=<Device name as listed in the target runner>'
+    required: true
+  workspace:
+    description: '<Path from the root of the repo to the workspace file>'
+    required: true
+  scheme:
+    description: '<Scheme corresponding to your project>'
+    required: true
+  xcode_build_output_file:
+    description: '<Machine-readable xcodebuild log in which the build and test output are stored>'
+    required: true
+  
+runs:
+  using: "composite"
+  steps:
+    - run: set -o pipefail && xcodebuild test -sdk iphonesimulator -destination ${{ inputs.destination }} -workspace ${{ inputs.workspace }} -scheme ${{ inputs.scheme }} -resultBundlePath ${{ inputs.xcode_build_output_file }} | xcpretty
+      shell: bash
+        # For running tests we use different iOS Simulators and for each build a corresponding machine-readable 
+        # xcodebuild log is written to the corresponding directory mentioned in the -resultBundlePath flag.
+        # This output is later used by Danger to generate PR Comments for build-related issues.
+        # Please refer to the following path for reference to the Xcodebuild flags
+        # https://gist.github.com/mtauraso/95a49eeb8e5b4335dd2b#-resultbundlepath

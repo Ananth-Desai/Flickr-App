@@ -1,0 +1,49 @@
+disabled_rules: # rule identifiers to exclude from running
+- cyclomatic_complexity # I don't really understand what this is yet
+- line_length # It's more or less impossible to write Cocoa with a reasonable line length
+- todo # As much as I'd like to always write perfect code all the time, reality requires short cuts. Might as well write those down with a TODO or FIXME so we can find them later.
+- vertical_whitespace
+- xctfail_message
+
+opt_in_rules: # some rules are only opt-in
+- empty_count
+
+custom_rules:
+    # Force unwrapping is not allowed in this codebase. This is because there is always a better way to use the code instead of `self!.`
+    # If your problem isn't solved with `unowned self`, or `self?.` then you should resort to using `guard let this = self else { /.../ }` and then proceed using `then.foo()` in the closure
+    # since `self` can be deallocated between one step and another.
+    force_unwrap_self:
+        name: "Force Unwrap Self"
+        excluded: ".*Test\\.swift"
+        regex: 'self!'
+        message: "Force unwrapping self is not allowed." # Perhaps we can make this error message have better information to tell the programmer why it isn't allowed, or what the programmer can do to fix the problem?
+        severity: error
+        
+excluded: # paths to ignore during linting. Takes precedence over `included`.
+- Pods
+- Flickr-App/Theme/R
+
+function_parameter_count:
+  warning: 10
+  error: 15
+
+function_body_length:
+  warning: 150
+  error: 200
+
+type_body_length:
+  warning: 1500
+  error: 2000
+
+file_length:
+  warning: 1200
+  error: 1500
+
+identifier_name:
+  max_length:
+    warning: 45
+    error: 60
+  min_length:
+    warning: 1
+
+reporter: "xcode"

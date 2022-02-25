@@ -1,0 +1,106 @@
+name: Flickr-App
+fileGroups: [
+  Flickr-App,
+  Flickr-AppTests,
+  Flickr-AppUITests
+]
+
+configs:
+  Prod-Debug: debug
+  Prod-Release: release 
+  Dev-Debug: debug
+  Dev-Release: release
+
+schemes:
+  Flickr-App:
+    build:
+      targets:
+        Flickr-App: all
+        Flickr-AppTests: [analyze, test, profile]
+        Flickr-AppUITests: [analyze, test, profile]
+    run:
+      config: Prod-Debug
+    archive:
+      config: Prod-Release
+    test:
+      config: Prod-Debug
+      targets: [Flickr-AppTests, Flickr-AppUITests]
+
+  Flickr-App-Dev:
+    build:
+      targets:
+        Flickr-App: all
+        Flickr-AppTests: [analyze, test, profile]
+        Flickr-AppUITests: [analyze, test, profile]
+    run:
+      config: Dev-Debug
+    archive:
+      config: Dev-Release
+    test:
+      config: Dev-Debug
+      targets: [Flickr-AppTests, Flickr-AppUITests]
+
+targets:
+  Flickr-App:
+    configFiles:
+      Dev-Debug: Flickr-App/Configs/Dev/Dev-Debug.xcconfig
+      Dev-Release: Flickr-App/Configs/Dev/Dev-Release.xcconfig
+      Prod-Debug: Flickr-App/Configs/Prod/Prod-Debug.xcconfig
+      Prod-Release: Flickr-App/Configs/Prod/Prod-Release.xcconfig
+    type: application
+    platform: iOS
+    deploymentTarget: 11.0
+    sources:
+      - path: Flickr-App/Strings
+        buildPhase: resources
+      - path: Flickr-App/Sources
+        buildPhase: sources
+      - path: Flickr-App/Resources
+        buildPhase: resources
+      - path: Flickr-App/Theme
+        buildPhase: sources
+        
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: "com.suryadigital.flickr"
+        DEVELOPMENT_TEAM: "000000"
+        INFOPLIST_FILE: Flickr-App/Plist/Info.plist
+        TARGETED_DEVICE_FAMILY: 1
+        
+    preBuildScripts:
+      - script: "\"$PODS_ROOT/R.swift/rswift\" generate \"$SRCROOT/Flickr-App/Theme/R/R.generated.swift\""
+        name: "R.swift"
+        inputFiles:
+          - $TEMP_DIR/rswift-lastrun
+        outputFiles:
+          - $SRCROOT/Flickr-App/Theme/R/R.generated.swift
+
+  Flickr-AppTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: 11.0
+    sources:
+      - path: Flickr-AppTests/Sources
+        buildPhase: sources
+    dependencies:
+      - target: Flickr-App
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: "com.suryadigital.flickr.tests"
+        INFOPLIST_FILE: Flickr-AppTests/Plist/Info.plist
+
+  Flickr-AppUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: 11.0
+    sources:
+      - path: Flickr-AppUITests/Sources
+        buildPhase: sources
+    dependencies:
+      - target: Flickr-App
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: "com.suryadigital.flickr.ui-tests"
+        DEVELOPMENT_TEAM: "000000"
+        INFOPLIST_FILE: Flickr-AppUITests/Plist/Info.plist
+        TARGETED_DEVICE_FAMILY: 1

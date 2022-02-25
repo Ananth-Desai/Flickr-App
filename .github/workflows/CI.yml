@@ -1,0 +1,34 @@
+name: PR-Check
+
+on: pull_request
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup SEDWIG_DEPLOY_KEY_PRIVATE
+      uses: gps/install-private-pod@master
+      with:
+        NAME: "SEDWIG_DEPLOY_KEY_PRIVATE"
+        SSH_KEY: ${{secrets.SEDWIG_DEPLOY_KEY_PRIVATE}} 
+        REPO: "git@github.com:surya-soft/Sedwig.git"
+        PODFILE: "./Podfile"
+    - name: Generate project
+      run: ./create-xcworkspace.sh
+
+    - name: Xcode build and test iPhone 8 iOS 15.0
+      uses: ./.github/actions/run-tests
+      with:
+        destination: "'platform=iOS Simulator,OS=15.0,name=iPhone 8'"
+        workspace: Flickr-App.xcworkspace
+        scheme: Flickr-App
+        xcode_build_output_file: xcodebuild_iPhone8_v15d0
+          # Update the Dangerfile if additional iOS build tests are added.
+
+    - name: Run Danger
+      if: ${{always()}}
+      run: bundle exec danger
+      env:
+        GITHUB_USERNAME: ${{github.actor}}
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

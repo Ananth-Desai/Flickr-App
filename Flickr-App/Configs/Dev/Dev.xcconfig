@@ -1,0 +1,10 @@
+//
+// Copyright © 2022 Surya Software Systems Pvt. Ltd.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// All the values common to the Dev environment are kept here.
+
+APICLIENT_BASE_URL = https:\/\/dev.example.com
