@@ -115,3 +115,7 @@ bin/xcodegen
 
 # R
 R.generated.swift
+
+# Other Files
+.bundle/
+vendor/
