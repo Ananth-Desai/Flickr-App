@@ -9,31 +9,30 @@ import Foundation
 import UIKit
 
 class HomeScreenVC: UIViewController {
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        
+
         let constraints = setupStackView()
         NSLayoutConstraint.activate(constraints)
     }
-    
+
     private func setupStackView() -> [NSLayoutConstraint] {
         let stackView = UIStackView(arrangedSubviews: [setupTextField(), setupSearchButton()])
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.spacing = stackViewSpacing
         stackView.distribution = .equalCentering
-        
+
         view.addSubview(stackView)
-        
+
         return [
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: stackViewYConstant),
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stackView.widthAnchor.constraint(equalTo: view.widthAnchor, constant: stackViewWidthConstant)
         ]
     }
-    
+
     private func setupTextField() -> UITextField {
         let textField = UITextField()
         textField.leftViewMode = .always
@@ -49,7 +48,7 @@ class HomeScreenVC: UIViewController {
         }
         return textField
     }
-    
+
     private func setupSearchButton() -> UIButton {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false

@@ -19,4 +19,5 @@ class TabsCoordinator {
 }
 
 // MARK: Constants
+
 private let navigationBarTitle = "Flickr"

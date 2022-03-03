@@ -22,7 +22,7 @@ class TabsVC: UIViewController {
         let tabController = UITabBarController()
         tabController.tabBar.backgroundColor = tabbarBackgroundColor
         tabController.tabBar.tintColor = tabbarTintColor
-        
+
         let homeVC = HomeScreenVC()
         homeVC.title = homeVcTitle
         if #available(iOS 13.0, *) {
@@ -30,7 +30,7 @@ class TabsVC: UIViewController {
         } else {
             // Fallback on earlier versions
         }
-        
+
         let favoritesVC = FavoritesVC()
         favoritesVC.title = favoritesVcTitle
         if #available(iOS 13.0, *) {
@@ -38,7 +38,7 @@ class TabsVC: UIViewController {
         } else {
             // Fallback on earlier versions
         }
-        
+
         let viewControllerArray = [homeVC, favoritesVC]
         tabController.setViewControllers(viewControllerArray, animated: true)
         view.addSubview(tabController.view)
