@@ -68,6 +68,13 @@ targets:
         TARGETED_DEVICE_FAMILY: 1
         
     preBuildScripts:
+      - name: swiftlint
+        script: >
+            if $SRCROOT/bin/swiftlint --version >/dev/null; then
+              $SRCROOT/bin/swiftlint --config "$SRCROOT/.swiftlint.yml"
+            else
+              echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
+            fi
       - script: "\"$PODS_ROOT/R.swift/rswift\" generate \"$SRCROOT/Flickr-App/Theme/R/R.generated.swift\""
         name: "R.swift"
         inputFiles:

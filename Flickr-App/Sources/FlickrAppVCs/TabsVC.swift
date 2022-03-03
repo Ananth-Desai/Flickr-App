@@ -34,7 +34,7 @@ class TabsVC: UIViewController {
         let favoritesVC = FavoritesVC()
         favoritesVC.title = favoritesVcTitle
         if #available(iOS 13.0, *) {
-            favoritesVC.tabBarItem = UITabBarItem(title: favoritesVcTitle, image: UIImage(systemName: "heart"), tag: 0)
+            favoritesVC.tabBarItem = UITabBarItem(title: favoritesVcTitle, image: UIImage(systemName: "heart"), tag: 1)
         } else {
             // Fallback on earlier versions
         }

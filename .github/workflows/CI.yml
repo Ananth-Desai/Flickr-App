@@ -20,7 +20,7 @@ jobs:
     - name: Xcode build and test iPhone 8 iOS 15.0
       uses: ./.github/actions/run-tests
       with:
-        destination: "'platform=iOS Simulator,OS=15.0,name=iPhone 8'"
+        destination: "'platform=iOS Simulator,OS=15.2,name=iPhone 8'"
         workspace: Flickr-App.xcworkspace
         scheme: Flickr-App
         xcode_build_output_file: xcodebuild_iPhone8_v15d0

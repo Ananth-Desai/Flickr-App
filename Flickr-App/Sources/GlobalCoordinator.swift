@@ -26,7 +26,7 @@ class GlobalCoordinator {
         if #available(iOS 13.0, *) {
             let navbarAppearance = UINavigationBarAppearance()
             navbarAppearance.titleTextAttributes = [
-                .font: UIFont(name: "Noteworthy", size: 24)!,
+                .font: UIFont(name: "Pacifico-Regular", size: 23)!,
                 .foregroundColor: navigationBarTitleColor
             ]
             navbarAppearance.backgroundColor = navigationBarBackgroundColor
