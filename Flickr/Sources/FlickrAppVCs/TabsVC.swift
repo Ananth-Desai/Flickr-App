@@ -8,20 +8,16 @@
 import Foundation
 import UIKit
 
-class TabsVC: UIViewController {
-    // MARK: Variables
-
-    private var tabController: UITabBarController?
-
+class TabsVC: UITabBarController {
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTabBarController()
     }
 
     func setupTabBarController() {
-        let tabController = UITabBarController()
-        tabController.tabBar.backgroundColor = tabbarBackgroundColor
-        tabController.tabBar.tintColor = tabbarTintColor
+        tabBar.backgroundColor = tabbarBackgroundColor
+        tabBar.tintColor = tabbarTintColor
 
         let homeVC = HomeScreenVC()
         homeVC.title = homeVcTitle
@@ -40,8 +36,7 @@ class TabsVC: UIViewController {
         }
 
         let viewControllerArray = [homeVC, favoritesVC]
-        tabController.setViewControllers(viewControllerArray, animated: true)
-        view.addSubview(tabController.view)
+        viewControllers = viewControllerArray
     }
 }
 
