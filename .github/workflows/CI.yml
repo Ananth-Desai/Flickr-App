@@ -21,7 +21,7 @@ jobs:
       uses: ./.github/actions/run-tests
       with:
         destination: "'platform=iOS Simulator,OS=15.2,name=iPhone 8'"
-        workspace: Flickr-App.xcworkspace
+        workspace: Flickr.xcworkspace
         scheme: Flickr
         xcode_build_output_file: xcodebuild_iPhone8_v15d0
           # Update the Dangerfile if additional iOS build tests are added.
