@@ -2,7 +2,7 @@
 // Copyright © 2022 Surya Software Systems Pvt. Ltd.
 //
 
-@testable import Flickr - App
+@testable import Flickr
 import XCTest
 
 class FlickrAppTests: XCTestCase {
