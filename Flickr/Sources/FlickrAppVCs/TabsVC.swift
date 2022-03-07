@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 
 class TabsVC: UITabBarController {
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTabBarController()
