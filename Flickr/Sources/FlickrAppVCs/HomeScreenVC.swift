@@ -32,7 +32,6 @@ class HomeScreenVC: UIViewController {
         textField.borderStyle = .roundedRect
         textField.keyboardType = .default
         if #available(iOS 13.0, *) {
-//            textField.leftView = UIImageView(image: )
             textField.leftView = getPlaceholderButton()
         } else {
             // Fallback on earlier versions
