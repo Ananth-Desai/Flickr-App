@@ -12,24 +12,33 @@ class FavoritesVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = viewBackgroundColor
-        setupView()
+        let constraints = setupView()
+        NSLayoutConstraint.activate(constraints)
     }
 
-    private func setupView() {
-        let textView = UITextView(frame: CGRect(x: 0, y: view.frame.height / 4, width: view.frame.width, height: 50))
+    private func setupView() -> [NSLayoutConstraint] {
+        let textView = UILabel()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.text = defaultText
         textView.font = UIFont(name: "Arial", size: 14)
         textView.textColor = textFieldColor
         textView.backgroundColor = viewBackgroundColor
         textView.textAlignment = .center
-        textView.isEditable = false
+        textView.lineBreakMode = .byClipping
+        textView.numberOfLines = textNumberOfLines
         view.addSubview(textView)
+        
+        return [
+            textView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            textView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            textView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100)
+        ]
     }
 }
 
 // MARK: Constants
 
-private let defaultText = "Search for a photo and mark it as your favorite. Photos marked as favorites can be viewed offline."
+private let defaultText = "Search for a photo and mark it as your \n favorite. Photos marked as favorites can be \n viewed offline."
 private let textFieldColor = UIColor(red: 0.592, green: 0.592, blue: 0.592, alpha: 1.0)
 private let viewBackgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1.0)
+private let textNumberOfLines = 3

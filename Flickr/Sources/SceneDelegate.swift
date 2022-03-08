@@ -17,8 +17,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         window = UIWindow(windowScene: windowScene)
-        globalCoordinator = GlobalCoordinator(window: window!)
-        globalCoordinator!.setupRootViewController()
+        guard let window = window else {
+            return
+        }
+        globalCoordinator = GlobalCoordinator(window: window)
+        globalCoordinator?.setupRootViewController()
     }
 
     func sceneDidDisconnect(_: UIScene) {

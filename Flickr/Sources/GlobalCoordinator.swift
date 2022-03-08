@@ -11,10 +11,10 @@ import UIKit
 class GlobalCoordinator {
     // MARK: Variables
 
-    private let window: UIWindow!
+    private let window: UIWindow?
     private var rootNav: UINavigationController?
 
-    init(window: UIWindow) {
+    init(window: UIWindow?) {
         self.window = window
     }
 
@@ -36,7 +36,7 @@ class GlobalCoordinator {
             // Fallback on earlier versions
         }
         rootNav = navController
-        window.setupRootViewController(with: rootNav!)
+        window?.setupRootViewController(with: rootNav)
     }
 }
 

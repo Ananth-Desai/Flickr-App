@@ -18,8 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // comes standard on the AppDelegate class. The UIWindow
             // is where all view controllers and views appear.
             window = UIWindow(frame: UIScreen.main.bounds)
-            globalCoordinator = GlobalCoordinator(window: window!)
-            globalCoordinator!.setupRootViewController()
+            globalCoordinator = GlobalCoordinator(window: window)
+            globalCoordinator?.setupRootViewController()
         }
         return true
     }
