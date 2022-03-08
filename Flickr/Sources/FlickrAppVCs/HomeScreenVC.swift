@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 
 class HomeScreenVC: UIViewController {
-        
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -58,7 +57,7 @@ class HomeScreenVC: UIViewController {
 
         return [
             button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
+            button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100)
         ]
     }
 }

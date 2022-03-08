@@ -27,7 +27,7 @@ class FavoritesVC: UIViewController {
         textView.lineBreakMode = .byClipping
         textView.numberOfLines = textNumberOfLines
         view.addSubview(textView)
-        
+
         return [
             textView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             textView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
