@@ -12,6 +12,7 @@ import UIKit
 class HomeScreenVC: UIViewController {
     private var progressButton: ProgressButton?
     private var searchButton: UIButton?
+    private var searchString: UITextField?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,20 +36,21 @@ class HomeScreenVC: UIViewController {
 
     @available(iOS 13.0, *)
     private func setupTextField() -> [NSLayoutConstraint] {
-        let label = UISearchTextField()
-        label.leftViewMode = .always
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.placeholder = textFieldPlaceholder
-        label.backgroundColor = textFieldBackground
-        label.tintColor = textFieldTintColor
-        label.borderStyle = .roundedRect
-        label.keyboardType = .default
-        view.addSubview(label)
+        let textField = UISearchTextField()
+        textField.leftViewMode = .always
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.placeholder = textFieldPlaceholder
+        textField.backgroundColor = textFieldBackground
+        textField.tintColor = textFieldTintColor
+        textField.borderStyle = .roundedRect
+        textField.keyboardType = .default
+        searchString = textField
+        view.addSubview(textField)
         return [
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -150),
-            label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
-            label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30)
+            textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            textField.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -150),
+            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30)
         ]
     }
 
@@ -85,13 +87,18 @@ class HomeScreenVC: UIViewController {
     }
 
     @objc private func clickedSearch() {
-        searchButton?.isHidden = true
-        progressButton?.isHidden = false
-        _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-            self.progressButton?.isHidden = true
-            self.searchButton?.isHidden = false
-            timer.invalidate()
+        let errorCoordinator = Flickr.ErrorCoordinator()
+        guard let alertVC = errorCoordinator.handleSearchStringErrors(searchString: searchString?.text) else {
+            searchButton?.isHidden = true
+            progressButton?.isHidden = false
+            _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
+                self.progressButton?.isHidden = true
+                self.searchButton?.isHidden = false
+                timer.invalidate()
+            }
+            return
         }
+        present(alertVC, animated: true, completion: nil)
     }
 }
 
