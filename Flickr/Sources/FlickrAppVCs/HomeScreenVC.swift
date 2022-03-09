@@ -6,9 +6,13 @@
 //
 
 import Foundation
+import LeoUI
 import UIKit
 
 class HomeScreenVC: UIViewController {
+    private var progressButton: ProgressButton?
+    private var searchButton: UIButton?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -24,6 +28,9 @@ class HomeScreenVC: UIViewController {
         }
         let searchButtonConstraints = setupSearchButton()
         NSLayoutConstraint.activate(searchButtonConstraints)
+
+        let progressButtonConstraints = setupProgressButton()
+        NSLayoutConstraint.activate(progressButtonConstraints)
     }
 
     @available(iOS 13.0, *)
@@ -53,12 +60,38 @@ class HomeScreenVC: UIViewController {
         button.backgroundColor = buttonColor
         button.setTitleColor(.white, for: .normal)
         button.contentEdgeInsets = buttonEdgeInsets
+        button.addTarget(self, action: #selector(clickedSearch), for: .touchUpInside)
+        searchButton = button
         view.addSubview(button)
 
         return [
             button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100)
         ]
+    }
+
+    private func setupProgressButton() -> [NSLayoutConstraint] {
+        let progress = ProgressButton(frame: CGRect())
+        progress.translatesAutoresizingMaskIntoConstraints = false
+        progress.isHidden = true
+        progress.showProgress()
+        progressButton = progress
+        view.addSubview(progress)
+
+        return [
+            progress.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            progress.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100)
+        ]
+    }
+
+    @objc private func clickedSearch() {
+        searchButton?.isHidden = true
+        progressButton?.isHidden = false
+        _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
+            self.progressButton?.isHidden = true
+            self.searchButton?.isHidden = false
+            timer.invalidate()
+        }
     }
 }
 
