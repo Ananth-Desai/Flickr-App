@@ -39,7 +39,7 @@ class HomeScreenVC: UIViewController {
         let textField = UISearchTextField()
         textField.leftViewMode = .always
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = textFieldPlaceholder
+        textField.placeholder = NSLocalizedString("searchFieldPlaceholder", comment: "")
         textField.backgroundColor = textFieldBackground
         textField.tintColor = textFieldTintColor
         textField.borderStyle = .roundedRect
@@ -58,7 +58,7 @@ class HomeScreenVC: UIViewController {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = buttonRadius
-        button.setTitle(buttonTitle, for: .normal)
+        button.setTitle(NSLocalizedString("searchButtonTitle", comment: ""), for: .normal)
         button.backgroundColor = buttonColor
         button.setTitleColor(.white, for: .normal)
         button.contentEdgeInsets = buttonEdgeInsets
@@ -106,8 +106,6 @@ class HomeScreenVC: UIViewController {
 
 private let textFieldBackground = UIColor(red: 0.462, green: 0.462, blue: 0.501, alpha: 0.02)
 private let textFieldIconColor = UIColor(red: 0.592, green: 0.592, blue: 0.592, alpha: 1.0)
-private let textFieldPlaceholder = "Search Flickr..."
-private let buttonTitle = "Search"
 private let buttonRadius: CGFloat = 10
 private let buttonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alpha: 1)
 private let textFieldTintColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)

@@ -26,6 +26,7 @@ class ErrorCoordinator {
     }
 
     func handleSearchStringErrors(searchString string: String?) -> UIAlertController? {
+        let alertTitle = NSLocalizedString("searchErrorTitle", comment: "")
         guard let string = string else {
             return nil
         }
@@ -33,10 +34,12 @@ class ErrorCoordinator {
             try checkSearchStringForErrors(string)
             return nil
         } catch SearchFieldErrors.emptySearch {
-            let errorVC = setupErrorAlertController(alertTitle: errorAlertTitle, alertMessage: emptySearchAlertTitle)
+            let emptySearchError = NSLocalizedString("emptySearchString", comment: "")
+            let errorVC = setupErrorAlertController(alertTitle: alertTitle, alertMessage: emptySearchError)
             return errorVC
         } catch SearchFieldErrors.stringLengthInsufficient {
-            let errorVC = setupErrorAlertController(alertTitle: errorAlertTitle, alertMessage: stringLengthInsufficientAlertMessage)
+            let stringLengthInsufficientError = NSLocalizedString("stringLengthInsufficientAlertTitle", comment: "")
+            let errorVC = setupErrorAlertController(alertTitle: alertTitle, alertMessage: stringLengthInsufficientError)
             return errorVC
         } catch {}
         return nil
@@ -44,13 +47,7 @@ class ErrorCoordinator {
 
     func setupErrorAlertController(alertTitle: String, alertMessage: String) -> UIAlertController {
         let alertVC = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
-        alertVC.addAction(UIAlertAction(title: "Back", style: .cancel, handler: nil))
+        alertVC.addAction(UIAlertAction(title: NSLocalizedString("back", comment: ""), style: .cancel, handler: nil))
         return alertVC
     }
 }
-
-// MARK: Constants
-
-private let errorAlertTitle: String = "Error"
-private let emptySearchAlertTitle: String = "Search String cannot be empty"
-private let stringLengthInsufficientAlertMessage: String = "Search string length must be greater than 2"

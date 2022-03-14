@@ -1,0 +1,22 @@
+//
+// Copyright © 2022 Surya Software Systems Pvt. Ltd.
+//
+
+home = "Home";
+
+// Tab Title Strings
+search = "Rechercher";
+favorites = "Favoris";
+
+// Favorites Screen Strings
+defaultText = "Recherchez une photo et marquez-lz \n comme votre favorite. Les photos marquées comme \n favorites peuvent être visualisées hors ligne.";
+
+// Search Screen Strings
+searchFieldPlaceholder = "Rechercher Flickr...";
+searchButtonTitle = "Rechercher";
+
+// Error Alert Strings
+searchErrorTitle = "Erreur";
+emptySearchString = "La chaîne de recherche ne peut être vide";
+stringLengthInsufficientAlertTitle = "La longueur de la chaîne de recherche doit être supérieure à 2";
+back = "Arrière";

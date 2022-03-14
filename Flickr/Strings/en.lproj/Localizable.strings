@@ -1,0 +1,22 @@
+//
+// Copyright © 2022 Surya Software Systems Pvt. Ltd.
+//
+
+home = "Home";
+
+// Tab Title Strings
+search = "Search";
+favorites = "Favorites";
+
+// Favorites Screen Strings
+defaultText = "Search for a photo and mark it as your \n favorite. Photos marked as favorites can be \n viewed offline.";
+
+// Search Screen Strings
+searchFieldPlaceholder = "Search Flickr...";
+searchButtonTitle = "Search";
+
+// Error Alert Strings
+searchErrorTitle = "Error";
+emptySearchString = "The search string cannot be empty";
+stringLengthInsufficientAlertTitle = "The search string length must be greater than 2";
+back = "Back";

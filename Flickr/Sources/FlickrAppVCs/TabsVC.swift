@@ -43,5 +43,5 @@ class TabsVC: UITabBarController {
 
 private let tabbarBackgroundColor = UIColor(red: 0.976, green: 0.976, blue: 0.976, alpha: 0.94)
 private let tabbarTintColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
-private let homeVcTitle = "Search"
-private let favoritesVcTitle = "Favorites"
+private let homeVcTitle = NSLocalizedString("search", comment: "")
+private let favoritesVcTitle = NSLocalizedString("favorites", comment: "")
