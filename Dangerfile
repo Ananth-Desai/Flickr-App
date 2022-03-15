@@ -4,9 +4,8 @@ warn("Big PR") if git.lines_of_code > 500
 # Show reasons for build failure if any
 xcode_summary.ignored_files = 'Pods/**'
 xcode_summary.inline_mode = true
-xcode_summary.report 'xcodebuild_iPhone8_v15d0.xcresult'
 # Add additional reports using the following format if iOS build targets are added in CI
-# xcode_summary.report 'xcodebuild_iPhone8_v13d0.xcresult'
+xcode_summary.report 'xcodebuild.json'
 
 
 # Run SwiftFormat and fail if there are any violations.

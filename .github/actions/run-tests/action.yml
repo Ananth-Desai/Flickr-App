@@ -17,7 +17,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: set -o pipefail && xcodebuild test -sdk iphonesimulator -destination ${{ inputs.destination }} -workspace ${{ inputs.workspace }} -scheme ${{ inputs.scheme }} -resultBundlePath ${{ inputs.xcode_build_output_file }} | xcpretty
+    - run: set -o pipefail && xcodebuild test -sdk iphonesimulator -destination ${{ inputs.destination }} -workspace ${{ inputs.workspace }} -scheme ${{ inputs.scheme }} | XCPRETTY_JSON_FILE_OUTPUT=xcodebuild.json xcpretty -f `xcpretty-json-formatter`
+
       shell: bash
         # For running tests we use different iOS Simulators and for each build a corresponding machine-readable 
         # xcodebuild log is written to the corresponding directory mentioned in the -resultBundlePath flag.

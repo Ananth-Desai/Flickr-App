@@ -7,6 +7,7 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    var globalCoordinator: GlobalCoordinator?
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -17,9 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // comes standard on the AppDelegate class. The UIWindow
             // is where all view controllers and views appear.
             window = UIWindow(frame: UIScreen.main.bounds)
-            // Create a new instance of LeoUIComponentsViewController
-            let viewController = ViewController()
-            window?.setupRootViewController(with: viewController)
+            globalCoordinator = GlobalCoordinator(window: window)
+            globalCoordinator?.setupRootViewController()
         }
         return true
     }

@@ -1,10 +1,9 @@
 platform :ios, '11.0'
 
-target 'Flickr-App' do
+target 'Flickr' do
   pod 'libPhoneNumber-iOS', '~> 0.8', :modular_headers => true
-  pod 'Sedwig', :git => 'git@github.com:surya-soft/Sedwig.git'
   pod 'R.swift'
-  target 'Flickr-AppTests' do
+  target 'FlickrTests' do
     pod 'libPhoneNumber-iOS', '~> 0.8', :modular_headers => true
   end
 

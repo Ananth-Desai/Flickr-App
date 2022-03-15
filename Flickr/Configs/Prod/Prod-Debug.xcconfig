@@ -7,7 +7,7 @@
 
 
 
-#include "Pods/Target Support Files/Pods-Flickr-App/Pods-Flickr-App.prod-debug.xcconfig"
-#include "Flickr-App/Configs/Prod/Prod.xcconfig"
+#include "Pods/Target Support Files/Pods-Flickr/Pods-Flickr.prod-debug.xcconfig"
+#include "Flickr/Configs/Prod/Prod.xcconfig"
 
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = PROD DEBUG
