@@ -44,6 +44,7 @@ class HomeScreenVC: UIViewController {
         textField.tintColor = textFieldTintColor
         textField.borderStyle = .roundedRect
         textField.keyboardType = .default
+        textField.addTarget(self, action: #selector(setButtonBackground), for: .editingChanged)
         searchString = textField
         view.addSubview(textField)
         return [
@@ -59,7 +60,7 @@ class HomeScreenVC: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = buttonRadius
         button.setTitle(NSLocalizedString("searchButtonTitle", comment: ""), for: .normal)
-        button.backgroundColor = buttonColor
+        button.backgroundColor = disabledButtonColor
         button.setTitleColor(.white, for: .normal)
         button.contentEdgeInsets = buttonEdgeInsets
         button.addTarget(self, action: #selector(clickedSearch), for: .touchUpInside)
@@ -73,17 +74,29 @@ class HomeScreenVC: UIViewController {
     }
 
     private func setupProgressButton() -> [NSLayoutConstraint] {
-        let progress = ProgressButton(frame: CGRect())
+        let progress = ProgressButton()
         progress.translatesAutoresizingMaskIntoConstraints = false
+        progress.layer.cornerRadius = buttonRadius
         progress.isHidden = true
+        progress.backgroundColor = enabledButtonColor
+        progress.contentEdgeInsets = buttonEdgeInsets
+        progress.setTitle("", for: .normal)
+        progress.setTitleColor(.white, for: .normal)
         progress.showProgress()
         progressButton = progress
         view.addSubview(progress)
 
         return [
             progress.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            progress.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100)
+            progress.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
+            progress.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: -50),
+            progress.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: 50),
         ]
+    }
+    
+    @objc private func setButtonBackground() {
+        searchButton?.isEnabled = (searchString?.text!.count)! > 0 ? true : false
+        searchButton?.backgroundColor = (searchString?.text!.count)! > 0 ? enabledButtonColor : disabledButtonColor
     }
 
     @objc private func clickedSearch() {
@@ -107,6 +120,7 @@ class HomeScreenVC: UIViewController {
 private let textFieldBackground = UIColor(red: 0.462, green: 0.462, blue: 0.501, alpha: 0.02)
 private let textFieldIconColor = UIColor(red: 0.592, green: 0.592, blue: 0.592, alpha: 1.0)
 private let buttonRadius: CGFloat = 10
-private let buttonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alpha: 1)
+private let enabledButtonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alpha: 1)
+private let disabledButtonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alpha: 0.5)
 private let textFieldTintColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
 private let buttonEdgeInsets = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 20)
