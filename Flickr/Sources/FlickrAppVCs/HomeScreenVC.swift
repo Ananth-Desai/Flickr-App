@@ -90,10 +90,10 @@ class HomeScreenVC: UIViewController {
             progress.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             progress.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
             progress.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: -50),
-            progress.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: 50),
+            progress.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: 50)
         ]
     }
-    
+
     @objc private func setButtonBackground() {
         searchButton?.isEnabled = (searchString?.text!.count)! > 0 ? true : false
         searchButton?.backgroundColor = (searchString?.text!.count)! > 0 ? enabledButtonColor : disabledButtonColor
