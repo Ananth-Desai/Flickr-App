@@ -79,18 +79,26 @@ class HomeScreenVC: UIViewController {
         progress.layer.cornerRadius = buttonRadius
         progress.isHidden = true
         progress.backgroundColor = enabledButtonColor
-        progress.contentEdgeInsets = buttonEdgeInsets
-        progress.setTitle("", for: .normal)
+        progress.titleEdgeInsets = buttonEdgeInsets
         progress.setTitleColor(.white, for: .normal)
         progress.showProgress()
         progressButton = progress
         view.addSubview(progress)
+        guard let searchString = searchString else {
+            return [
+                progress.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                progress.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
+                progress.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: -50),
+                progress.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: 50)
+            ]
+        }
 
         return [
             progress.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             progress.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
             progress.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: -50),
-            progress.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: 50)
+            progress.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: 50),
+            progress.topAnchor.constraint(equalTo: searchString.bottomAnchor, constant: 10)
         ]
     }
 
