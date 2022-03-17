@@ -113,13 +113,22 @@ class HomeScreenVC: UIViewController {
 
     @objc private func clickedSearch() {
         let errorCoordinator = Flickr.ErrorCoordinator()
+        let apiCoordinator = ApiCoordinator()
         guard let alertVC = errorCoordinator.handleSearchStringErrors(searchString: searchBar?.text) else {
+            guard let searchBar = searchBar else {
+                return
+            }
+            let searchStatus = apiCoordinator.fetchPhotos(searchString: searchBar.text ?? "")
             searchButton?.isHidden = true
             progressButton?.isHidden = false
             _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
                 self.progressButton?.isHidden = true
                 self.searchButton?.isHidden = false
                 timer.invalidate()
+            }
+            if searchStatus == true {
+                let searchResultsVC = SearchResultsVC()
+//                navigationController?.pushViewController(searchResultsVC, animated: true)
             }
             return
         }
