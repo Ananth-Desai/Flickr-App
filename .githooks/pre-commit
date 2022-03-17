@@ -5,4 +5,4 @@ set -eu
 # Pre commit hooks run from the root of the repo, per https://git-scm.com/docs/githooks
 ./download-tools.sh
 ./bin/swiftformat . --lint
-./bin/swiftlint
+./bin/swiftlint 

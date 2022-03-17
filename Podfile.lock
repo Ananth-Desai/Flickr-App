@@ -1,24 +1,60 @@
 PODS:
+  - LeoUI (0.1.0):
+    - libPhoneNumber-iOS (~> 0.8)
   - libPhoneNumber-iOS (0.9.15)
   - R.swift (6.1.0):
     - R.swift.Library (~> 5.3.0)
   - R.swift.Library (5.3.0)
+  - RxSwift (6.5.0)
+  - Sedwig (0.1.0):
+    - Sedwig/AsyncAPIClientCombine (= 0.1.0)
+    - Sedwig/AsyncAPIClientRx (= 0.1.0)
+    - Sedwig/CoreAPIClient (= 0.1.0)
+    - Sedwig/SyncAPIClient (= 0.1.0)
+  - Sedwig/AsyncAPIClientCombine (0.1.0):
+    - Sedwig/CoreAPIClient
+  - Sedwig/AsyncAPIClientRx (0.1.0):
+    - RxSwift
+    - Sedwig/CoreAPIClient
+  - Sedwig/CoreAPIClient (0.1.0)
+  - Sedwig/SyncAPIClient (0.1.0):
+    - Sedwig/CoreAPIClient
 
 DEPENDENCIES:
+  - "LeoUI (from `git@github.com:surya-soft/Leo-iOS-UI.git`)"
   - libPhoneNumber-iOS (~> 0.8)
   - R.swift
+  - Sedwig (from `https://github.com/surya-soft/Sedwig.git`)
 
 SPEC REPOS:
   trunk:
     - libPhoneNumber-iOS
     - R.swift
     - R.swift.Library
+    - RxSwift
+
+EXTERNAL SOURCES:
+  LeoUI:
+    :git: "git@github.com:surya-soft/Leo-iOS-UI.git"
+  Sedwig:
+    :git: https://github.com/surya-soft/Sedwig.git
+
+CHECKOUT OPTIONS:
+  LeoUI:
+    :commit: d2542b0a91e2be166bd57a9aa1becb22860395a6
+    :git: "git@github.com:surya-soft/Leo-iOS-UI.git"
+  Sedwig:
+    :commit: b725383b680d570e98dda35ec43865defb93b6ea
+    :git: https://github.com/surya-soft/Sedwig.git
 
 SPEC CHECKSUMS:
+  LeoUI: 7d4b98e223cfd57e010333f2fac2b2468be2094d
   libPhoneNumber-iOS: 0a32a9525cf8744fe02c5206eb30d571e38f7d75
   R.swift: ec98ff71c4ab2f6fd01dd077e5afd15e63a4834c
   R.swift.Library: 0fc583cb55a99e28901299cc451614cad1161962
+  RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
+  Sedwig: 6892a5ff356ee3cec32fc7b21824741d0e1fcdf8
 
-PODFILE CHECKSUM: ed833cfcb8b31d13d4b22f199db644c2b70382d4
+PODFILE CHECKSUM: df9fe029acd525af143860e5634f5076f2b7caff
 
 COCOAPODS: 1.11.2

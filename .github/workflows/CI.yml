@@ -7,13 +7,6 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup SEDWIG_DEPLOY_KEY_PRIVATE
-      uses: gps/install-private-pod@master
-      with:
-        NAME: "SEDWIG_DEPLOY_KEY_PRIVATE"
-        SSH_KEY: ${{secrets.SEDWIG_DEPLOY_KEY_PRIVATE}} 
-        REPO: "git@github.com:surya-soft/Sedwig.git"
-        PODFILE: "./Podfile"
     - name: Generate project
       run: ./create-xcworkspace.sh
 
