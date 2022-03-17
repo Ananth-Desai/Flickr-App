@@ -8,11 +8,12 @@
 import Foundation
 import LeoUI
 import UIKit
+import RxSwift
 
 class HomeScreenVC: UIViewController {
-    private var progressButton: ProgressButton?
-    private var searchButton: UIButton?
-    private var searchString: UITextField?
+    private weak var progressButton: ProgressButton?
+    private weak var searchButton: UIButton?
+    private weak var searchBar: UISearchBar?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,12 +22,9 @@ class HomeScreenVC: UIViewController {
     }
 
     private func setupViews() {
-        if #available(iOS 13.0, *) {
-            let textFieldConstraints = setupTextField()
-            NSLayoutConstraint.activate(textFieldConstraints)
-        } else {
-            // Fallback on earlier versions
-        }
+        let textFieldConstraints = setupTextField()
+        NSLayoutConstraint.activate(textFieldConstraints)
+        
         let searchButtonConstraints = setupSearchButton()
         NSLayoutConstraint.activate(searchButtonConstraints)
 
@@ -34,82 +32,90 @@ class HomeScreenVC: UIViewController {
         NSLayoutConstraint.activate(progressButtonConstraints)
     }
 
-    @available(iOS 13.0, *)
     private func setupTextField() -> [NSLayoutConstraint] {
-        let textField = UISearchTextField()
-        textField.leftViewMode = .always
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = NSLocalizedString("searchFieldPlaceholder", comment: "")
-        textField.backgroundColor = textFieldBackground
-        textField.tintColor = textFieldTintColor
-        textField.borderStyle = .roundedRect
-        textField.keyboardType = .default
-        textField.addTarget(self, action: #selector(setButtonBackground), for: .editingChanged)
-        searchString = textField
-        view.addSubview(textField)
+        let searchBar = UISearchBar()
+        if #available(iOS 13.0, *) {
+            searchBar.searchTextField.addTarget(self, action: #selector(setButtonBackground), for: .editingChanged)
+            searchBar.searchTextField.borderStyle = .roundedRect
+        } else {
+            // Fallback on earlier versions
+            let searchTextField = searchBar.value(forKey: "searchField") as? UITextField
+            searchTextField?.addTarget(self, action: #selector(setButtonBackground), for: .editingChanged)
+            searchTextField?.borderStyle = .roundedRect
+        }
+        searchBar.searchBarStyle = .minimal
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.placeholder = NSLocalizedString("searchFieldPlaceholder", comment: "")
+        searchBar.backgroundColor = textFieldBackground
+        searchBar.tintColor = textFieldTintColor
+        searchBar.keyboardType = .default
+        self.searchBar = searchBar
+        view.addSubview(searchBar)
         return [
-            textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            textField.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -150),
-            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
-            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30)
+            searchBar.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            searchBar.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: searchBarCenterYAnchorConstant),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: searchBarLeadingAnchorConstant),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: searchBarTrailingAnchorConstant)
         ]
     }
 
     private func setupSearchButton() -> [NSLayoutConstraint] {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.layer.cornerRadius = buttonRadius
-        button.setTitle(NSLocalizedString("searchButtonTitle", comment: ""), for: .normal)
-        button.backgroundColor = disabledButtonColor
-        button.setTitleColor(.white, for: .normal)
-        button.contentEdgeInsets = buttonEdgeInsets
-        button.addTarget(self, action: #selector(clickedSearch), for: .touchUpInside)
-        searchButton = button
-        view.addSubview(button)
+        let searchButton = UIButton()
+        searchButton.translatesAutoresizingMaskIntoConstraints = false
+        searchButton.layer.cornerRadius = buttonRadius
+        searchButton.setTitle(NSLocalizedString("searchButtonTitle", comment: ""), for: .normal)
+        searchButton.backgroundColor = disabledButtonColor
+        searchButton.setTitleColor(.white, for: .normal)
+        searchButton.contentEdgeInsets = buttonEdgeInsets
+        searchButton.addTarget(self, action: #selector(clickedSearch), for: .touchUpInside)
+        self.searchButton = searchButton
+        view.addSubview(searchButton)
 
         return [
-            button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100)
+            searchButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            searchButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: searchButtonCenterYAnchotConstant)
         ]
     }
 
     private func setupProgressButton() -> [NSLayoutConstraint] {
-        let progress = ProgressButton()
-        progress.translatesAutoresizingMaskIntoConstraints = false
-        progress.layer.cornerRadius = buttonRadius
-        progress.isHidden = true
-        progress.backgroundColor = enabledButtonColor
-        progress.titleEdgeInsets = buttonEdgeInsets
-        progress.setTitleColor(.white, for: .normal)
-        progress.showProgress()
-        progressButton = progress
-        view.addSubview(progress)
-        guard let searchString = searchString else {
+        let progressButton = ProgressButton()
+        progressButton.translatesAutoresizingMaskIntoConstraints = false
+        progressButton.layer.cornerRadius = buttonRadius
+        progressButton.isHidden = true
+        progressButton.backgroundColor = enabledButtonColor
+        progressButton.setTitleColor(.white, for: .normal)
+        progressButton.showProgress()
+        self.progressButton = progressButton
+        view.addSubview(progressButton)
+        guard let searchBar = searchBar else {
             return [
-                progress.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                progress.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
-                progress.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: -50),
-                progress.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: 50)
+                progressButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                progressButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: progressButtonCenterYAnchorConstant),
+                progressButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: progressButtonLeadingAnchorConstant),
+                progressButton.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: progressButtonTrailingAnchorConstant)
             ]
         }
 
         return [
-            progress.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            progress.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
-            progress.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: -50),
-            progress.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: 50),
-            progress.topAnchor.constraint(equalTo: searchString.bottomAnchor, constant: 10)
+            progressButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            progressButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: progressButtonCenterYAnchorConstant),
+            progressButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: progressButtonLeadingAnchorConstant),
+            progressButton.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: progressButtonTrailingAnchorConstant),
+            progressButton.topAnchor.constraint(equalTo: searchBar.bottomAnchor)
         ]
     }
 
     @objc private func setButtonBackground() {
-        searchButton?.isEnabled = (searchString?.text!.count)! > 0 ? true : false
-        searchButton?.backgroundColor = (searchString?.text!.count)! > 0 ? enabledButtonColor : disabledButtonColor
+        guard let searchBar = searchBar else {
+            return
+        }
+        searchButton?.isEnabled = (searchBar.text?.count ?? 0) > 0 ? true : false
+        searchButton?.backgroundColor = (searchBar.text?.count ?? 0) > 0 ? enabledButtonColor : disabledButtonColor
     }
 
     @objc private func clickedSearch() {
         let errorCoordinator = Flickr.ErrorCoordinator()
-        guard let alertVC = errorCoordinator.handleSearchStringErrors(searchString: searchString?.text) else {
+        guard let alertVC = errorCoordinator.handleSearchStringErrors(searchString: searchBar?.text) else {
             searchButton?.isHidden = true
             progressButton?.isHidden = false
             _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
@@ -132,3 +138,10 @@ private let enabledButtonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alph
 private let disabledButtonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alpha: 0.5)
 private let textFieldTintColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
 private let buttonEdgeInsets = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 20)
+private let searchBarCenterYAnchorConstant: CGFloat = -150;
+private let searchBarLeadingAnchorConstant: CGFloat = 30;
+private let searchBarTrailingAnchorConstant: CGFloat = -30;
+private let searchButtonCenterYAnchotConstant: CGFloat = -100;
+private let progressButtonCenterYAnchorConstant: CGFloat = -100;
+private let progressButtonLeadingAnchorConstant: CGFloat = -50;
+private let progressButtonTrailingAnchorConstant: CGFloat = 50;
