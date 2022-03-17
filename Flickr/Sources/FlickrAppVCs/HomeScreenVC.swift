@@ -8,7 +8,6 @@
 import Foundation
 import LeoUI
 import UIKit
-import RxSwift
 
 class HomeScreenVC: UIViewController {
     private weak var progressButton: ProgressButton?
@@ -24,7 +23,6 @@ class HomeScreenVC: UIViewController {
     private func setupViews() {
         let textFieldConstraints = setupTextField()
         NSLayoutConstraint.activate(textFieldConstraints)
-        
         let searchButtonConstraints = setupSearchButton()
         NSLayoutConstraint.activate(searchButtonConstraints)
 
@@ -138,10 +136,10 @@ private let enabledButtonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alph
 private let disabledButtonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alpha: 0.5)
 private let textFieldTintColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
 private let buttonEdgeInsets = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 20)
-private let searchBarCenterYAnchorConstant: CGFloat = -150;
-private let searchBarLeadingAnchorConstant: CGFloat = 30;
-private let searchBarTrailingAnchorConstant: CGFloat = -30;
-private let searchButtonCenterYAnchotConstant: CGFloat = -100;
-private let progressButtonCenterYAnchorConstant: CGFloat = -100;
-private let progressButtonLeadingAnchorConstant: CGFloat = -50;
-private let progressButtonTrailingAnchorConstant: CGFloat = 50;
+private let searchBarCenterYAnchorConstant: CGFloat = -150
+private let searchBarLeadingAnchorConstant: CGFloat = 30
+private let searchBarTrailingAnchorConstant: CGFloat = -30
+private let searchButtonCenterYAnchotConstant: CGFloat = -100
+private let progressButtonCenterYAnchorConstant: CGFloat = -100
+private let progressButtonLeadingAnchorConstant: CGFloat = -50
+private let progressButtonTrailingAnchorConstant: CGFloat = 50
