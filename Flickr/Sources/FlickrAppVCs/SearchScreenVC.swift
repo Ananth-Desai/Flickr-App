@@ -9,10 +9,11 @@ import Foundation
 import LeoUI
 import UIKit
 
-class HomeScreenVC: UIViewController {
+class SearchScreenVC: UIViewController {
     private weak var progressButton: ProgressButton?
     private weak var searchButton: UIButton?
     private weak var searchBar: UISearchBar?
+    weak var searchScreenDelegate: SearchScreenViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -113,11 +114,11 @@ class HomeScreenVC: UIViewController {
 
     @objc private func clickedSearch() {
         let errorCoordinator = Flickr.ErrorCoordinator()
-        let apiCoordinator = ApiCoordinator()
         guard let alertVC = errorCoordinator.handleSearchStringErrors(searchString: searchBar?.text) else {
             guard let searchBar = searchBar else {
                 return
             }
+            let apiCoordinator = ApiCoordinator()
             let searchStatus = apiCoordinator.fetchPhotos(searchString: searchBar.text ?? "")
             searchButton?.isHidden = true
             progressButton?.isHidden = false
@@ -127,8 +128,8 @@ class HomeScreenVC: UIViewController {
                 timer.invalidate()
             }
             if searchStatus == true {
-                let searchResultsVC = SearchResultsVC()
-//                navigationController?.pushViewController(searchResultsVC, animated: true)
+                print("Delegate: \(searchScreenDelegate)")
+                searchScreenDelegate?.didTapSearchButton(searchString: searchBar.text ?? "")
             }
             return
         }

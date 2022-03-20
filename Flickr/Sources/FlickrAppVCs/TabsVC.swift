@@ -18,23 +18,23 @@ class TabsVC: UITabBarController {
         tabBar.backgroundColor = tabbarBackgroundColor
         tabBar.tintColor = tabbarTintColor
 
-        let homeVC = HomeScreenVC()
-        homeVC.title = homeVcTitle
+        let searchCoordinator = SearchTabCoordinator()
+        let searchVC = searchCoordinator.returnRootNavigator()
         if #available(iOS 13.0, *) {
-            homeVC.tabBarItem = UITabBarItem(title: homeVcTitle, image: UIImage(systemName: "magnifyingglass"), tag: 0)
+            searchVC.tabBarItem = UITabBarItem(title: homeVcTitle, image: UIImage(systemName: "magnifyingglass"), tag: 0)
         } else {
             // Fallback on earlier versions
         }
 
-        let favoritesVC = FavoritesVC()
-        favoritesVC.title = favoritesVcTitle
+        let favoritesCoordinator = FavoritesCoordinator()
+        let favoritesVC = favoritesCoordinator.returnRootNavigator()
         if #available(iOS 13.0, *) {
             favoritesVC.tabBarItem = UITabBarItem(title: favoritesVcTitle, image: UIImage(systemName: "heart"), tag: 1)
         } else {
             // Fallback on earlier versions
         }
 
-        let viewControllerArray = [homeVC, favoritesVC]
+        let viewControllerArray = [searchVC, favoritesVC]
         viewControllers = viewControllerArray
     }
 }
