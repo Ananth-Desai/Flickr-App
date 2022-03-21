@@ -16,7 +16,13 @@ class ErrorCoordinator {
         case stringLengthInsufficient
     }
 
-    func checkSearchStringForErrors(_ string: String) throws {
+    private enum SearchApiCallErros: Error {
+        case networkError
+        case nilSearchResults
+        case decodingError
+    }
+
+    private func checkSearchStringForErrors(_ string: String) throws {
         guard string.isEmpty == false else {
             throw SearchFieldErrors.emptySearch
         }
@@ -25,8 +31,13 @@ class ErrorCoordinator {
         }
     }
 
+    private func setupErrorAlertController(alertTitle: String, alertMessage: String) -> UIAlertController {
+        let alertVC = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
+        alertVC.addAction(UIAlertAction(title: backButtonText, style: .cancel, handler: nil))
+        return alertVC
+    }
+
     func handleSearchStringErrors(searchString string: String?) -> UIAlertController? {
-        let alertTitle = NSLocalizedString("searchErrorTitle", comment: "")
         guard let string = string else {
             return nil
         }
@@ -34,20 +45,19 @@ class ErrorCoordinator {
             try checkSearchStringForErrors(string)
             return nil
         } catch SearchFieldErrors.emptySearch {
-            let emptySearchError = NSLocalizedString("emptySearchString", comment: "")
-            let errorVC = setupErrorAlertController(alertTitle: alertTitle, alertMessage: emptySearchError)
+            let errorVC = setupErrorAlertController(alertTitle: searchErrorTitle, alertMessage: emptySearchErrorText)
             return errorVC
         } catch SearchFieldErrors.stringLengthInsufficient {
-            let stringLengthInsufficientError = NSLocalizedString("stringLengthInsufficientAlertTitle", comment: "")
-            let errorVC = setupErrorAlertController(alertTitle: alertTitle, alertMessage: stringLengthInsufficientError)
+            let errorVC = setupErrorAlertController(alertTitle: searchErrorTitle, alertMessage: stringLengthInsufficientAlert)
             return errorVC
         } catch {}
         return nil
     }
-
-    func setupErrorAlertController(alertTitle: String, alertMessage: String) -> UIAlertController {
-        let alertVC = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
-        alertVC.addAction(UIAlertAction(title: NSLocalizedString("back", comment: ""), style: .cancel, handler: nil))
-        return alertVC
-    }
 }
+
+// MARK: Constants
+
+private let searchErrorTitle = R.string.localizable.searchErrorTitle()
+private let emptySearchErrorText = R.string.localizable.emptySearchString()
+private let stringLengthInsufficientAlert = R.string.localizable.stringLengthInsufficientAlertTitle()
+private let backButtonText = R.string.localizable.back()

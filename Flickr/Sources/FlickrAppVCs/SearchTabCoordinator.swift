@@ -14,25 +14,29 @@ class SearchTabCoordinator {
     private func returnSearchScreenVC() -> UIViewController {
         let searchScreenVC = SearchScreenVC()
         searchScreenVC.searchScreenDelegate = self
-        searchScreenVC.title = "Flickr"
+        let titleAttributes = [
+            NSAttributedString.Key.font: UIFont(name: "Pacifico-Regular", size: 23)!,
+            NSAttributedString.Key.foregroundColor: navigationBarTitleColor
+        ]
+        let title = NSAttributedString(string: "Flickr", attributes: titleAttributes)
+        let navLabel = UILabel()
+        navLabel.attributedText = title
+        searchScreenVC.navigationItem.titleView = navLabel
         return searchScreenVC
     }
 
     func returnRootNavigator() -> UINavigationController {
         let searchScreenVC = returnSearchScreenVC()
         let rootNav = UINavigationController(rootViewController: searchScreenVC)
-        rootNav.navigationBar.isTranslucent = false
         if #available(iOS 13.0, *) {
+            rootNav.navigationBar.isTranslucent = false
             let navbarAppearance = UINavigationBarAppearance()
-            navbarAppearance.titleTextAttributes = [
-                .font: UIFont(name: "Pacifico-Regular", size: 23)!,
-                .foregroundColor: navigationBarTitleColor
-            ]
             navbarAppearance.backgroundColor = navigationBarBackgroundColor
             rootNav.navigationBar.standardAppearance = navbarAppearance
             rootNav.navigationBar.scrollEdgeAppearance = navbarAppearance
         } else {
             // Fallback on earlier versions
+            rootNav.navigationBar.backgroundColor = navigationBarBackgroundColor
         }
         rootNavigationController = rootNav
         return rootNav

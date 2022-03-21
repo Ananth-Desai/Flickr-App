@@ -19,7 +19,7 @@ class FavoritesVC: UIViewController {
     private func setupView() -> [NSLayoutConstraint] {
         let textView = UILabel()
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.text = NSLocalizedString("defaultText", comment: "")
+        textView.text = favoritesDefaultText
         textView.font = UIFont(name: "Arial", size: 14)
         textView.textColor = textFieldColor
         textView.backgroundColor = viewBackgroundColor
@@ -41,3 +41,4 @@ class FavoritesVC: UIViewController {
 private let textFieldColor = UIColor(red: 0.592, green: 0.592, blue: 0.592, alpha: 1.0)
 private let viewBackgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1.0)
 private let textNumberOfLines = 3
+private let favoritesDefaultText = R.string.localizable.defaultText()

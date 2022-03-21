@@ -57,17 +57,15 @@ class ApiCoordinator {
         return true
     }
 
-    private func constructIndividualUrls(_ result: Photos?) -> Bool {
+    private func constructIndividualUrls(_ result: Photos) -> Bool {
         var individualPhotosUrls: [URL] = []
-        guard let result = result else {
-            return false
-        }
         for photo in result.photos.photo {
             guard let imageUrl = returnImageURl(image: photo) else {
                 return false
             }
             individualPhotosUrls.append(imageUrl)
         }
+        print(individualPhotosUrls)
         return true
     }
 }
