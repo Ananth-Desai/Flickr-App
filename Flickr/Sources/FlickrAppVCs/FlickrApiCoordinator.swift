@@ -65,7 +65,6 @@ class ApiCoordinator {
             }
             individualPhotosUrls.append(imageUrl)
         }
-        print(individualPhotosUrls)
         return true
     }
 }
