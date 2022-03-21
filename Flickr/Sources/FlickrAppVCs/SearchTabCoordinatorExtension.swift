@@ -9,7 +9,6 @@ import Foundation
 
 extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
     func didTapSearchButton(searchString: String) {
-        print("Called")
         let searchResultsVC = SearchResultsVC()
         searchResultsVC.title = searchString
         rootNavigationController?.pushViewController(searchResultsVC, animated: true)
