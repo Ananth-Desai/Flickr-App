@@ -20,6 +20,7 @@ class FavoritesCoordinator {
             rootNav.navigationBar.scrollEdgeAppearance = navbarAppearance
         } else {
             // Fallback on earlier versions
+            rootNav.navigationBar.backgroundColor = navigationBarBackgroundColor
         }
         return rootNav
     }
