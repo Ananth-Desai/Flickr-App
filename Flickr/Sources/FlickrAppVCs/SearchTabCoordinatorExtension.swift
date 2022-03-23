@@ -9,7 +9,7 @@ import Foundation
 
 extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
     func didTapSearchButton(searchString: String) {
-        let searchResultsVC = SearchResultsVC()
+        let searchResultsVC = SearchResultsVC(searchString: searchString)
         searchResultsVC.title = searchString
         rootNavigationController?.pushViewController(searchResultsVC, animated: true)
     }

@@ -5,6 +5,7 @@ target 'Flickr' do
   pod 'LeoUI', :git => 'https://github.com/surya-soft/Leo-iOS-UI.git'
   pod 'Sedwig', :git => 'https://github.com/surya-soft/Sedwig.git'
   pod 'R.swift'
+  pod 'Nuke', '~> 9.0'
   target 'FlickrTests' do
     pod 'libPhoneNumber-iOS', '~> 0.8', :modular_headers => true
   end
