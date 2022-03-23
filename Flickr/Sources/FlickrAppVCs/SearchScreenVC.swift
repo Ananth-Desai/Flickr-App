@@ -120,7 +120,7 @@ class SearchScreenVC: UIViewController {
                 return
             }
             let apiCoordinator = ApiCoordinator()
-            let searchStatus = apiCoordinator.fetchPhotos(searchString: searchBar.text ?? "")
+            apiCoordinator.fetchPhotos(searchString: searchBar.text ?? "")
             searchButton?.isHidden = true
             progressButton?.isHidden = false
             _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
@@ -128,9 +128,7 @@ class SearchScreenVC: UIViewController {
                 self.searchButton?.isHidden = false
                 timer.invalidate()
             }
-            if searchStatus == true {
-                searchScreenDelegate?.didTapSearchButton(searchString: searchBar.text ?? "")
-            }
+            searchScreenDelegate?.didTapSearchButton(searchString: searchBar.text ?? "")
             return
         }
         present(alertVC, animated: true, completion: nil)

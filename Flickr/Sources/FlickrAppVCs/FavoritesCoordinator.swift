@@ -29,4 +29,4 @@ class FavoritesCoordinator {
 // MARK: Constants
 
 private let navigationBarBackgroundColor = UIColor(red: 0.976, green: 0.976, blue: 0.976, alpha: 0.94)
-private let favoritesVcTitle = NSLocalizedString("favorites", comment: "")
+private let favoritesVcTitle = R.string.localizable.favorites()

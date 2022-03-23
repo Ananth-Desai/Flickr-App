@@ -32,9 +32,9 @@ class ApiCoordinator {
         URL(string: "\(imageSearchUrl)/\(image.server)/\(image.id)_\(image.secret).jpg")
     }
 
-    func fetchPhotos(searchString: String) -> Bool {
+    func fetchPhotos(searchString: String) {
         guard let url = returnSearchUrl(searchString: searchString) else {
-            return false
+            return
         }
         let task = URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
             guard let data = data, error == nil else {
@@ -54,7 +54,7 @@ class ApiCoordinator {
             }
         })
         task.resume()
-        return true
+        return
     }
 
     private func constructIndividualUrls(_ result: Photos) -> Bool {

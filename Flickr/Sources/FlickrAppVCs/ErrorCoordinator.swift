@@ -18,7 +18,7 @@ class ErrorCoordinator {
 
     private enum SearchApiCallErros: Error {
         case networkError
-        case nilSearchResults
+        case emptySearchResults
         case decodingError
     }
 
