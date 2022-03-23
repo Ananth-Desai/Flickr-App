@@ -127,7 +127,7 @@ class SearchScreenVC: UIViewController {
                 timer.invalidate()
             }
             searchScreenDelegate?.didTapSearchButton(searchString: searchBar.text ?? "")
-        return
+            return
         }
         present(alertVC, animated: true, completion: nil)
     }

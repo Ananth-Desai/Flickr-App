@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import UIKit
 import Nuke
+import UIKit
 
 struct Photos: Codable {
     var photos: PhotoArray
@@ -15,9 +15,9 @@ struct Photos: Codable {
 
 struct PhotoArray: Codable {
     var photo: [SinglePhoto]
-    
+
     func getPhotoArray() -> [SinglePhoto] {
-        return photo;
+        photo
     }
 }
 
@@ -30,20 +30,20 @@ struct SinglePhoto: Codable {
 }
 
 class SearchResultsVC: UIViewController {
-    
     private var photos: [URL] = []
     private var searchString: String?
     private var collectionView: UICollectionView?
-    
+
     init(searchString: String) {
         self.searchString = searchString
         super.init(nibName: nil, bundle: nil)
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func returnImageView(cell: UICollectionViewCell, indexPath: IndexPath) -> [NSLayoutConstraint] {
         let imageView = UIImageView()
         imageView.tag = 10
@@ -54,7 +54,7 @@ class SearchResultsVC: UIViewController {
         imageView.sizeToFit()
         Nuke.loadImage(with: photos[indexPath.row], into: imageView)
         cell.addSubview(imageView)
-        
+
         return [
             imageView.leadingAnchor.constraint(equalTo: cell.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: cell.trailingAnchor),
@@ -62,24 +62,23 @@ class SearchResultsVC: UIViewController {
         ]
     }
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         navigationController?.navigationBar.tintColor = navigationBarTitleColor
         let constraints = setupCollectionView()
         NSLayoutConstraint.activate(constraints)
-        self.fetchPhotos(searchString: searchString ?? "")
+        fetchPhotos(searchString: searchString ?? "")
     }
-    
+
     private func returnSearchUrl(searchString: String) -> URL? {
-        return URL(string: "\(baseSearchUrl)/?method=\(apiMethod)&api_key=\(apiKey)&format=\(format)&nojsoncallback=\(noJsonCallback)&text=\(searchString)")
+        URL(string: "\(baseSearchUrl)/?method=\(apiMethod)&api_key=\(apiKey)&format=\(format)&nojsoncallback=\(noJsonCallback)&text=\(searchString)")
     }
 
     private func returnImageURl(image: SinglePhoto) -> URL? {
-        return URL(string: "\(imageSearchUrl)/\(image.server)/\(image.id)_\(image.secret).jpg")
+        URL(string: "\(imageSearchUrl)/\(image.server)/\(image.id)_\(image.secret).jpg")
     }
-    
+
     private func constructIndividualUrls(_ result: Photos) -> [URL] {
         var individualPhotoUrls: [URL] = []
         for photo in result.photos.photo {
@@ -90,7 +89,7 @@ class SearchResultsVC: UIViewController {
         }
         return individualPhotoUrls
     }
-    
+
     func fetchPhotos(searchString: String) {
         var photosArray: [URL] = []
         guard let url = returnSearchUrl(searchString: searchString) else {
@@ -117,7 +116,7 @@ class SearchResultsVC: UIViewController {
         })
         task.resume()
     }
-    
+
     func setupCollectionView() -> [NSLayoutConstraint] {
         let collectionViewLayout = UICollectionViewFlowLayout()
         collectionViewLayout.minimumInteritemSpacing = 0
@@ -131,7 +130,7 @@ class SearchResultsVC: UIViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         self.collectionView = collectionView
         view.addSubview(collectionView)
-        
+
         return [
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
@@ -142,15 +141,15 @@ class SearchResultsVC: UIViewController {
 }
 
 extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photos.count
+    func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
+        photos.count
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "customCell", for: indexPath)
         let imageViewConstriants = returnImageView(cell: cell, indexPath: indexPath)
         NSLayoutConstraint.activate(imageViewConstriants)
-        
+
         return cell
     }
 }
