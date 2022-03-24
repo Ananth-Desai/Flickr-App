@@ -44,17 +44,18 @@ class SearchResultsVC: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func returnImageView(cell: UICollectionViewCell, indexPath: IndexPath) -> [NSLayoutConstraint] {
+    func returnImageView(cell _: UICollectionViewCell, indexPath _: IndexPath) -> UIImageView {
         let imageView = UIImageView()
-        imageView.tag = 10
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.sizeToFit()
-        Nuke.loadImage(with: photos[indexPath.row], into: imageView)
-        cell.addSubview(imageView)
+        imageView.configureView { imageView in
+            imageView.tag = 10
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+        }
+        return imageView
+    }
 
-        return [
+    func returnImageViewConstraints(imageView: UIImageView, cell: UICollectionViewCell) -> [NSLayoutConstraint] {
+        [
             imageView.leadingAnchor.constraint(equalTo: cell.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: cell.trailingAnchor),
             imageView.topAnchor.constraint(equalTo: cell.topAnchor),
@@ -64,7 +65,7 @@ class SearchResultsVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = viewBackgroundColor
         navigationController?.navigationBar.tintColor = navigationBarTitleColor
         let constraints = setupCollectionView()
         NSLayoutConstraint.activate(constraints)
@@ -117,17 +118,23 @@ class SearchResultsVC: UIViewController {
         task.resume()
     }
 
-    func setupCollectionView() -> [NSLayoutConstraint] {
+    func returnCollectionViewFlowLayout() -> UICollectionViewFlowLayout {
         let collectionViewLayout = UICollectionViewFlowLayout()
         collectionViewLayout.minimumInteritemSpacing = minimumInteritemSpacing
         collectionViewLayout.minimumLineSpacing = minimumLineSpacing
         collectionViewLayout.sectionInset = sectionInset
         collectionViewLayout.itemSize = CGSize(width: view.frame.width / widthDivisor, height: cellHeight)
-        let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: collectionViewLayout)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return collectionViewLayout
+    }
+
+    func setupCollectionView() -> [NSLayoutConstraint] {
+        let collectionViewFlowLayout = returnCollectionViewFlowLayout()
+        let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: collectionViewFlowLayout)
+        collectionView.configureView { collectionView in
+            collectionView.delegate = self
+            collectionView.dataSource = self
+            collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
+        }
         self.collectionView = collectionView
         view.addSubview(collectionView)
 
@@ -141,8 +148,9 @@ class SearchResultsVC: UIViewController {
 
     func returnSpinner(cell: UICollectionViewCell) -> [NSLayoutConstraint] {
         let spinner = UIActivityIndicatorView()
-        spinner.startAnimating()
-        spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.configureView { spinner in
+            spinner.startAnimating()
+        }
         cell.addSubview(spinner)
         return [
             spinner.centerXAnchor.constraint(equalTo: cell.centerXAnchor),
@@ -151,7 +159,7 @@ class SearchResultsVC: UIViewController {
     }
 }
 
-extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate {
+extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
         photos.isEmpty ? 20 : photos.count
     }
@@ -162,8 +170,11 @@ extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate 
             let spinnerConstraints = returnSpinner(cell: cell)
             NSLayoutConstraint.activate(spinnerConstraints)
         } else {
-            let imageViewConstriants = returnImageView(cell: cell, indexPath: indexPath)
-            NSLayoutConstraint.activate(imageViewConstriants)
+            let imageView = returnImageView(cell: cell, indexPath: indexPath)
+            Nuke.loadImage(with: photos[indexPath.row], into: imageView)
+            cell.addSubview(imageView)
+            let imageViewConstraints = returnImageViewConstraints(imageView: imageView, cell: cell)
+            NSLayoutConstraint.activate(imageViewConstraints)
         }
         return cell
     }
