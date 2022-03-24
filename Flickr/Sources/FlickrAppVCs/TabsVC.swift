@@ -24,12 +24,12 @@ class TabsVC: UITabBarController {
         let searchCoordinator = SearchTabCoordinator()
         self.searchCoordinator = searchCoordinator
         let searchVC = searchCoordinator.returnRootNavigator()
-        searchVC.tabBarItem = UITabBarItem(title: homeVcTitle, image: UIImage(named: "Search Icon"), tag: 0)
+        searchVC.tabBarItem = UITabBarItem(title: homeVcTitle, image: searchIcon, tag: 0)
 
         let favoritesCoordinator = FavoritesCoordinator()
         self.favoritesCoordinator = favoritesCoordinator
         let favoritesVC = favoritesCoordinator.returnRootNavigator()
-        favoritesVC.tabBarItem = UITabBarItem(title: favoritesVcTitle, image: UIImage(named: "Heart Icon"), tag: 0)
+        favoritesVC.tabBarItem = UITabBarItem(title: favoritesVcTitle, image: favoritesIcon, tag: 0)
 
         let viewControllerArray = [searchVC, favoritesVC]
         viewControllers = viewControllerArray
@@ -38,7 +38,9 @@ class TabsVC: UITabBarController {
 
 // MARK: Constants
 
-private let tabbarBackgroundColor = UIColor(red: 0.976, green: 0.976, blue: 0.976, alpha: 0.94)
-private let tabbarTintColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
+private let tabbarBackgroundColor = returnColorPalette().tabBarBackground
+private let tabbarTintColor = returnColorPalette().tabBarButtonColor
 private let homeVcTitle = R.string.localizable.search()
 private let favoritesVcTitle = R.string.localizable.favorites()
+private let searchIcon = R.image.searchIcon()
+private let favoritesIcon = R.image.heartIcon()

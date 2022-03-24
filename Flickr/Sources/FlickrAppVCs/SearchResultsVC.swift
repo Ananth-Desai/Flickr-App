@@ -156,10 +156,11 @@ extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate 
 
 // MARK: Constants
 
-private let navigationBarTitleColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
 private let baseSearchUrl = "https://www.flickr.com/services/rest"
 private let imageSearchUrl = "https://live.staticflickr.com"
 private let apiKey = "397717930841a3bd19df470ac48fc84f"
 private let apiMethod = "flickr.photos.search"
 private let format = "json"
 private let noJsonCallback = 1
+private let navigationBarTitleColor = returnColorPalette().navigationBarTitleColor
+private let viewBackgroundColor = returnColorPalette().viewBackgroundColor

@@ -20,7 +20,7 @@ class FavoritesVC: UIViewController {
         let textView = UILabel()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.text = favoritesDefaultText
-        textView.font = UIFont(name: "Arial", size: 14)
+        textView.font = UIFont(name: favoritesDefaultTextFontName, size: favoritesDefaultTextFontSize)
         textView.textColor = textFieldColor
         textView.backgroundColor = viewBackgroundColor
         textView.textAlignment = .center
@@ -31,14 +31,17 @@ class FavoritesVC: UIViewController {
         return [
             textView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             textView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            textView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100)
+            textView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: textViewCenterYAnchorConstant)
         ]
     }
 }
 
 // MARK: Constants
 
-private let textFieldColor = UIColor(red: 0.592, green: 0.592, blue: 0.592, alpha: 1.0)
-private let viewBackgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1.0)
+private let textFieldColor = returnColorPalette().favoritesDefaultTextColor
+private let viewBackgroundColor = returnColorPalette().viewBackgroundColor
 private let textNumberOfLines = 3
 private let favoritesDefaultText = R.string.localizable.defaultText()
+private let favoritesDefaultTextFontName = "Arial"
+private let favoritesDefaultTextFontSize: CGFloat = 14
+private let textViewCenterYAnchorConstant: CGFloat = -100

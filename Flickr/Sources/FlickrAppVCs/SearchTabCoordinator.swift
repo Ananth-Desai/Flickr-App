@@ -15,10 +15,10 @@ class SearchTabCoordinator {
         let searchScreenVC = SearchScreenVC()
         searchScreenVC.searchScreenDelegate = self
         let titleAttributes = [
-            NSAttributedString.Key.font: UIFont(name: "Pacifico-Regular", size: 23)!,
+            NSAttributedString.Key.font: UIFont(name: titleFontName, size: 23)!,
             NSAttributedString.Key.foregroundColor: navigationBarTitleColor
         ]
-        let title = NSAttributedString(string: "Flickr", attributes: titleAttributes)
+        let title = NSAttributedString(string: title, attributes: titleAttributes)
         let navLabel = UILabel()
         navLabel.attributedText = title
         searchScreenVC.navigationItem.titleView = navLabel
@@ -45,5 +45,7 @@ class SearchTabCoordinator {
 
 // MARK: Constants
 
-private let navigationBarTitleColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
-private let navigationBarBackgroundColor = UIColor(red: 0.976, green: 0.976, blue: 0.976, alpha: 0.94)
+private let navigationBarTitleColor = returnColorPalette().navigationBarTitleColor
+private let navigationBarBackgroundColor = returnColorPalette().navigationBarBackground
+private let titleFontName = "Pacifico-Regular"
+private let title = "Flickr"
