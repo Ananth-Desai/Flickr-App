@@ -119,12 +119,12 @@ class SearchResultsVC: UIViewController {
 
     func setupCollectionView() -> [NSLayoutConstraint] {
         let collectionViewLayout = UICollectionViewFlowLayout()
-        collectionViewLayout.minimumInteritemSpacing = 3
-        collectionViewLayout.minimumLineSpacing = 3
-        collectionViewLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        collectionViewLayout.itemSize = CGSize(width: view.frame.width / 3.2, height: 120.0)
+        collectionViewLayout.minimumInteritemSpacing = minimumInteritemSpacing
+        collectionViewLayout.minimumLineSpacing = minimumLineSpacing
+        collectionViewLayout.sectionInset = sectionInset
+        collectionViewLayout.itemSize = CGSize(width: view.frame.width / widthDivisor, height: cellHeight)
         let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: collectionViewLayout)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "customCell")
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -157,7 +157,7 @@ extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate 
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "customCell", for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath)
         if photos.isEmpty {
             let spinnerConstraints = returnSpinner(cell: cell)
             NSLayoutConstraint.activate(spinnerConstraints)
@@ -179,3 +179,10 @@ private let format = "json"
 private let noJsonCallback = 1
 private let navigationBarTitleColor = returnColorPalette().navigationBarTitleColor
 private let viewBackgroundColor = returnColorPalette().viewBackgroundColor
+private let cellHeight: CGFloat = 120
+private let placeholderCount = 20
+private let cellReuseIdentifier = "customCell"
+private let minimumInteritemSpacing: CGFloat = 3
+private let minimumLineSpacing: CGFloat = 3
+private let sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+private let widthDivisor = 3.2
