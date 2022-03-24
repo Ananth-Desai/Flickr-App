@@ -38,8 +38,8 @@ class TabsVC: UITabBarController {
 
 // MARK: Constants
 
-private let tabbarBackgroundColor = returnColorPalette().tabBarBackground
-private let tabbarTintColor = returnColorPalette().tabBarButtonColor
+private let tabbarBackgroundColor = R.color.tabBarBackground()
+private let tabbarTintColor = R.color.tabBarTintColor()
 private let homeVcTitle = R.string.localizable.search()
 private let favoritesVcTitle = R.string.localizable.favorites()
 private let searchIcon = R.image.searchIcon()

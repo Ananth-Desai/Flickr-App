@@ -45,7 +45,7 @@ class SearchTabCoordinator {
 
 // MARK: Constants
 
-private let navigationBarTitleColor = returnColorPalette().navigationBarTitleColor
-private let navigationBarBackgroundColor = returnColorPalette().navigationBarBackground
+private let navigationBarTitleColor = R.color.navigationBarTintColor()
+private let navigationBarBackgroundColor = R.color.navigationBarBackground()
 private let titleFontName = "Pacifico-Regular"
 private let title = "Flickr"
