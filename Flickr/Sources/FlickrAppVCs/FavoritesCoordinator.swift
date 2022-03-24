@@ -28,5 +28,5 @@ class FavoritesCoordinator {
 
 // MARK: Constants
 
-private let navigationBarBackgroundColor = UIColor(red: 0.976, green: 0.976, blue: 0.976, alpha: 0.94)
+private let navigationBarBackgroundColor = returnColorPalette().navigationBarBackground
 private let favoritesVcTitle = R.string.localizable.favorites()

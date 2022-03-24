@@ -11,11 +11,12 @@ import UIKit
 class SearchResultsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = viewBackgroundColor
         navigationController?.navigationBar.tintColor = navigationBarTitleColor
     }
 }
 
 // MARK: Constants
 
-private let navigationBarTitleColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
+private let navigationBarTitleColor = returnColorPalette().navigationBarTitleColor
+private let viewBackgroundColor = returnColorPalette().viewBackgroundColor

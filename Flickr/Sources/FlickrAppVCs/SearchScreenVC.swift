@@ -17,7 +17,7 @@ class SearchScreenVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = viewBackgroundColor
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         setupViews()
     }
@@ -39,7 +39,7 @@ class SearchScreenVC: UIViewController {
             searchBar.searchTextField.borderStyle = .roundedRect
         } else {
             // Fallback on earlier versions
-            let searchTextField = searchBar.value(forKey: "searchField") as? UITextField
+            let searchTextField = searchBar.value(forKey: searchBarKey) as? UITextField
             searchTextField?.addTarget(self, action: #selector(setButtonBackground), for: .editingChanged)
             searchTextField?.borderStyle = .roundedRect
         }
@@ -137,12 +137,13 @@ class SearchScreenVC: UIViewController {
 
 // MARK: Constants
 
-private let textFieldBackground = UIColor(red: 0.462, green: 0.462, blue: 0.501, alpha: 0.02)
-private let textFieldIconColor = UIColor(red: 0.592, green: 0.592, blue: 0.592, alpha: 1.0)
+private let viewBackgroundColor = returnColorPalette().viewBackgroundColor
+private let textFieldBackground = returnColorPalette().searchBarBackgroundColor
+private let textFieldIconColor = returnColorPalette().searchBarIconColor
 private let buttonRadius: CGFloat = 10
-private let enabledButtonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alpha: 1)
-private let disabledButtonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alpha: 0.5)
-private let textFieldTintColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
+private let enabledButtonColor = returnColorPalette().searchButtonEnbledBackground
+private let disabledButtonColor = returnColorPalette().searchButtonDisabledBackground
+private let textFieldTintColor = returnColorPalette().searchBarTintColor
 private let buttonEdgeInsets = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 20)
 private let searchBarCenterYAnchorConstant: CGFloat = -150
 private let searchBarLeadingAnchorConstant: CGFloat = 30
@@ -151,7 +152,8 @@ private let searchButtonCenterYAnchotConstant: CGFloat = -100
 private let progressButtonCenterYAnchorConstant: CGFloat = -100
 private let progressButtonLeadingAnchorConstant: CGFloat = -50
 private let progressButtonTrailingAnchorConstant: CGFloat = 50
-private let navigationBarTitleColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
-private let navigationBarBackgroundColor = UIColor(red: 0.976, green: 0.976, blue: 0.976, alpha: 0.94)
+private let navigationBarTitleColor = returnColorPalette().navigationBarTitleColor
+private let navigationBarBackgroundColor = returnColorPalette().navigationBarBackground
 private let searchFieldPlaceholder = R.string.localizable.searchFieldPlaceholder()
 private let searchButtonTitle = R.string.localizable.searchButtonTitle()
+private let searchBarKey = "searchField"
