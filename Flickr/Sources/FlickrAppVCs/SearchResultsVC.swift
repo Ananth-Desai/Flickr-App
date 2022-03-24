@@ -47,7 +47,6 @@ class SearchResultsVC: UIViewController {
     func returnImageView(cell: UICollectionViewCell, indexPath: IndexPath) -> [NSLayoutConstraint] {
         let imageView = UIImageView()
         imageView.tag = 10
-        imageView.backgroundColor = .red
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -58,7 +57,8 @@ class SearchResultsVC: UIViewController {
         return [
             imageView.leadingAnchor.constraint(equalTo: cell.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: cell.trailingAnchor),
-            imageView.topAnchor.constraint(equalTo: cell.topAnchor)
+            imageView.topAnchor.constraint(equalTo: cell.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: cell.bottomAnchor)
         ]
     }
 
@@ -119,10 +119,10 @@ class SearchResultsVC: UIViewController {
 
     func setupCollectionView() -> [NSLayoutConstraint] {
         let collectionViewLayout = UICollectionViewFlowLayout()
-        collectionViewLayout.minimumInteritemSpacing = 0
-        collectionViewLayout.minimumLineSpacing = 0
+        collectionViewLayout.minimumInteritemSpacing = 3
+        collectionViewLayout.minimumLineSpacing = 3
         collectionViewLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        collectionViewLayout.itemSize = CGSize(width: 123.0, height: 120.0)
+        collectionViewLayout.itemSize = CGSize(width: view.frame.width / 3.2, height: 120.0)
         let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: collectionViewLayout)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "customCell")
         collectionView.delegate = self
@@ -138,18 +138,33 @@ class SearchResultsVC: UIViewController {
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ]
     }
+
+    func returnSpinner(cell: UICollectionViewCell) -> [NSLayoutConstraint] {
+        let spinner = UIActivityIndicatorView()
+        spinner.startAnimating()
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        cell.addSubview(spinner)
+        return [
+            spinner.centerXAnchor.constraint(equalTo: cell.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: cell.centerYAnchor)
+        ]
+    }
 }
 
 extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
-        photos.count
+        photos.isEmpty ? 20 : photos.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "customCell", for: indexPath)
-        let imageViewConstriants = returnImageView(cell: cell, indexPath: indexPath)
-        NSLayoutConstraint.activate(imageViewConstriants)
-
+        if photos.isEmpty {
+            let spinnerConstraints = returnSpinner(cell: cell)
+            NSLayoutConstraint.activate(spinnerConstraints)
+        } else {
+            let imageViewConstriants = returnImageView(cell: cell, indexPath: indexPath)
+            NSLayoutConstraint.activate(imageViewConstriants)
+        }
         return cell
     }
 }
