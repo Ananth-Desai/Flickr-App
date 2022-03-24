@@ -13,11 +13,6 @@ class TabsCoordinator {
 
     func setupRootViewController() -> UIViewController {
         let tabsVC = TabsVC()
-        tabsVC.title = navigationBarTitle
         return tabsVC
     }
 }
-
-// MARK: Constants
-
-private let navigationBarTitle = "Flickr"

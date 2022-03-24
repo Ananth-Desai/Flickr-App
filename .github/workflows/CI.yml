@@ -7,6 +7,11 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Set GitHub Token to URLs
+      shell: bash
+      run: |
+        sed -E 's|git@github.com:(..*).git|https://${{ secrets.PRVT_REPO_ACCESS }}@github.com/\1|g' Podfile > Podfile.backup
+        mv Podfile.backup Podfile
     - name: Generate project
       run: ./create-xcworkspace.sh
 

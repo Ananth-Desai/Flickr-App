@@ -9,14 +9,16 @@ import Foundation
 import LeoUI
 import UIKit
 
-class HomeScreenVC: UIViewController {
+class SearchScreenVC: UIViewController {
     private weak var progressButton: ProgressButton?
     private weak var searchButton: UIButton?
     private weak var searchBar: UISearchBar?
+    weak var searchScreenDelegate: SearchScreenViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = viewBackgroundColor
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         setupViews()
     }
 
@@ -37,13 +39,13 @@ class HomeScreenVC: UIViewController {
             searchBar.searchTextField.borderStyle = .roundedRect
         } else {
             // Fallback on earlier versions
-            let searchTextField = searchBar.value(forKey: "searchField") as? UITextField
+            let searchTextField = searchBar.value(forKey: searchBarKey) as? UITextField
             searchTextField?.addTarget(self, action: #selector(setButtonBackground), for: .editingChanged)
             searchTextField?.borderStyle = .roundedRect
         }
         searchBar.searchBarStyle = .minimal
         searchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.placeholder = NSLocalizedString("searchFieldPlaceholder", comment: "")
+        searchBar.placeholder = searchFieldPlaceholder
         searchBar.backgroundColor = textFieldBackground
         searchBar.tintColor = textFieldTintColor
         searchBar.keyboardType = .default
@@ -61,7 +63,7 @@ class HomeScreenVC: UIViewController {
         let searchButton = UIButton()
         searchButton.translatesAutoresizingMaskIntoConstraints = false
         searchButton.layer.cornerRadius = buttonRadius
-        searchButton.setTitle(NSLocalizedString("searchButtonTitle", comment: ""), for: .normal)
+        searchButton.setTitle(searchButtonTitle, for: .normal)
         searchButton.backgroundColor = disabledButtonColor
         searchButton.setTitleColor(.white, for: .normal)
         searchButton.contentEdgeInsets = buttonEdgeInsets
@@ -114,6 +116,11 @@ class HomeScreenVC: UIViewController {
     @objc private func clickedSearch() {
         let errorCoordinator = Flickr.ErrorCoordinator()
         guard let alertVC = errorCoordinator.handleSearchStringErrors(searchString: searchBar?.text) else {
+            guard let searchBar = searchBar else {
+                return
+            }
+            let apiCoordinator = ApiCoordinator()
+            apiCoordinator.fetchPhotos(searchString: searchBar.text ?? "")
             searchButton?.isHidden = true
             progressButton?.isHidden = false
             _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
@@ -121,6 +128,7 @@ class HomeScreenVC: UIViewController {
                 self.searchButton?.isHidden = false
                 timer.invalidate()
             }
+            searchScreenDelegate?.didTapSearchButton(searchString: searchBar.text ?? "")
             return
         }
         present(alertVC, animated: true, completion: nil)
@@ -129,12 +137,13 @@ class HomeScreenVC: UIViewController {
 
 // MARK: Constants
 
-private let textFieldBackground = UIColor(red: 0.462, green: 0.462, blue: 0.501, alpha: 0.02)
-private let textFieldIconColor = UIColor(red: 0.592, green: 0.592, blue: 0.592, alpha: 1.0)
+private let viewBackgroundColor = returnColorPalette().viewBackgroundColor
+private let textFieldBackground = returnColorPalette().searchBarBackgroundColor
+private let textFieldIconColor = returnColorPalette().searchBarIconColor
 private let buttonRadius: CGFloat = 10
-private let enabledButtonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alpha: 1)
-private let disabledButtonColor = UIColor(red: 0, green: 0.835, blue: 0.498, alpha: 0.5)
-private let textFieldTintColor = UIColor(red: 0.952, green: 0.219, blue: 0.474, alpha: 1.0)
+private let enabledButtonColor = returnColorPalette().searchButtonEnbledBackground
+private let disabledButtonColor = returnColorPalette().searchButtonDisabledBackground
+private let textFieldTintColor = returnColorPalette().searchBarTintColor
 private let buttonEdgeInsets = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 20)
 private let searchBarCenterYAnchorConstant: CGFloat = -150
 private let searchBarLeadingAnchorConstant: CGFloat = 30
@@ -143,3 +152,8 @@ private let searchButtonCenterYAnchotConstant: CGFloat = -100
 private let progressButtonCenterYAnchorConstant: CGFloat = -100
 private let progressButtonLeadingAnchorConstant: CGFloat = -50
 private let progressButtonTrailingAnchorConstant: CGFloat = 50
+private let navigationBarTitleColor = returnColorPalette().navigationBarTitleColor
+private let navigationBarBackgroundColor = returnColorPalette().navigationBarBackground
+private let searchFieldPlaceholder = R.string.localizable.searchFieldPlaceholder()
+private let searchButtonTitle = R.string.localizable.searchButtonTitle()
+private let searchBarKey = "searchField"

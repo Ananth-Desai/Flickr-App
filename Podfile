@@ -2,7 +2,7 @@ platform :ios, '11.0'
 
 target 'Flickr' do
   pod 'libPhoneNumber-iOS', '~> 0.8', :modular_headers => true
-  pod 'LeoUI', :git => 'https://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:x-oauth-basic@github.com/surya-soft/Leo-iOS-UI.git'
+  pod 'LeoUI', :git => 'https://github.com/surya-soft/Leo-iOS-UI.git'
   pod 'Sedwig', :git => 'https://github.com/surya-soft/Sedwig.git'
   pod 'R.swift'
   target 'FlickrTests' do
