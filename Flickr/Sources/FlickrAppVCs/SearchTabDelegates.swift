@@ -10,3 +10,7 @@ import Foundation
 protocol SearchScreenViewControllerDelegate: AnyObject {
     func didTapSearchButton(searchString: String)
 }
+
+protocol SearchResultsViewControllerDelegate: AnyObject {
+    func didSelectImage(url: URL, title: String, imageTitle: String)
+}

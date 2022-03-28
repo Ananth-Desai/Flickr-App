@@ -31,8 +31,10 @@ struct SinglePhoto: Codable {
 
 class SearchResultsVC: UIViewController {
     private var photos: [URL] = []
+    private var imageTitles: [String] = []
     private var searchString: String?
     private var collectionView: UICollectionView?
+    weak var searchResultsDelegate: SearchResultsViewControllerDelegate?
 
     init(searchString: String) {
         self.searchString = searchString
@@ -67,6 +69,7 @@ class SearchResultsVC: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = viewBackgroundColor
         navigationController?.navigationBar.tintColor = navigationBarTitleColor
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         let constraints = setupCollectionView()
         NSLayoutConstraint.activate(constraints)
         fetchPhotos(searchString: searchString ?? "")
@@ -87,6 +90,7 @@ class SearchResultsVC: UIViewController {
                 return []
             }
             individualPhotoUrls.append(imageUrl)
+            imageTitles.append(photo.title)
         }
         return individualPhotoUrls
     }
@@ -177,6 +181,13 @@ extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate,
             NSLayoutConstraint.activate(imageViewConstraints)
         }
         return cell
+    }
+
+    func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let searchString = self.searchString, photos.isEmpty == false else {
+            return
+        }
+        searchResultsDelegate?.didSelectImage(url: photos[indexPath.row], title: searchString, imageTitle: imageTitles[indexPath.row])
     }
 }
 
