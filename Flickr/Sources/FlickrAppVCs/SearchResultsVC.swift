@@ -34,6 +34,7 @@ class SearchResultsVC: UIViewController {
     private var imageTitles: [String] = []
     private var searchString: String?
     private var collectionView: UICollectionView?
+    private var constants = GlobalConstants()
     weak var searchResultsDelegate: SearchResultsViewControllerDelegate?
 
     init(searchString: String) {
@@ -76,11 +77,11 @@ class SearchResultsVC: UIViewController {
     }
 
     private func returnSearchUrl(searchString: String) -> URL? {
-        URL(string: "\(baseSearchUrl)/?method=\(apiMethod)&api_key=\(apiKey)&format=\(format)&nojsoncallback=\(noJsonCallback)&text=\(searchString)")
+        constants.returnSearchUrl(searchString: searchString)
     }
 
     private func returnImageURl(image: SinglePhoto) -> URL? {
-        URL(string: "\(imageSearchUrl)/\(image.server)/\(image.id)_\(image.secret).jpg")
+        constants.returnImageUrl(image: image)
     }
 
     private func constructIndividualUrls(_ result: Photos) -> [URL] {
@@ -193,12 +194,6 @@ extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate,
 
 // MARK: Constants
 
-private let baseSearchUrl = "https://www.flickr.com/services/rest"
-private let imageSearchUrl = "https://live.staticflickr.com"
-private let apiKey = "397717930841a3bd19df470ac48fc84f"
-private let apiMethod = "flickr.photos.search"
-private let format = "json"
-private let noJsonCallback = 1
 private let navigationBarTitleColor = R.color.navigationBarTintColor()
 private let viewBackgroundColor = R.color.viewBackground()
 private let cellHeight: CGFloat = 120

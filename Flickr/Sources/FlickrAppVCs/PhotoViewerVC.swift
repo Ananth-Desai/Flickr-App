@@ -11,17 +11,20 @@ import UIKit
 
 class PhotoViewerVC: UIViewController {
     private var url: URL
-    private var favouriteState: Bool?
+    private var favoriteState: Bool
     private var imageTitle: String?
     private weak var stackView: UIStackView?
     private weak var imageView: UIImageView?
-    private weak var favoriteEnabledButton: UIButton?
-    private weak var favoriteDisabledButton: UIButton?
+    private weak var favoriteButton: UIButton?
 
-    init(url: URL, title _: String, imageTitle: String) {
+    init(url: URL, imageTitle: String) {
         self.url = url
         self.imageTitle = imageTitle
-        favouriteState = false
+        if UserDefaults.standard.object(forKey: imageTitle) != nil {
+            favoriteState = true
+        } else {
+            favoriteState = false
+        }
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -33,10 +36,11 @@ class PhotoViewerVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = viewBackgroundColor
-        let imageViewConstraints = setupImageView(stackView: stackView)
-        NSLayoutConstraint.activate(imageViewConstraints)
+        let imageViewConstraints = setupImageView()
         let stackViewConstraints = setupStackView()
-        NSLayoutConstraint.activate(stackViewConstraints)
+        let labelConstraints = returnLabel(stackView: stackView)
+        let iconConstraints = returnIcon(stackView: stackView)
+        NSLayoutConstraint.activate(imageViewConstraints + stackViewConstraints + labelConstraints + iconConstraints)
     }
 
     private func setupStackView() -> [NSLayoutConstraint] {
@@ -45,71 +49,57 @@ class PhotoViewerVC: UIViewController {
             stackView.axis = .horizontal
             stackView.alignment = .fill
             stackView.distribution = .fill
-            stackView.spacing = 20
+            stackView.spacing = stackViewSpacing
         }
         self.stackView = stackView
-        let labelConstraints = returnLabel(stackView: stackView)
-        NSLayoutConstraint.activate(labelConstraints)
-        let iconConstraints = returnIcon(stackView: stackView)
-        NSLayoutConstraint.activate(iconConstraints)
         view.addSubview(stackView)
 
         guard let imageView = imageView else {
             return []
         }
         return [
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15.0),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15.0),
-            stackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20.0)
+            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: stackViewLeadingAnchorConstant),
+            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: stackViewTrailingAnchorConstant),
+            stackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: stackViewTopAnchorConstant)
         ]
     }
 
-    private func returnLabel(stackView: UIStackView) -> [NSLayoutConstraint] {
+    private func returnLabel(stackView: UIStackView?) -> [NSLayoutConstraint] {
         let label = UILabel()
         label.configureView { label in
             label.text = imageTitle
-            label.font = label.font.withSize(20)
+            label.font = label.font.withSize(labelFontSize)
             label.clipsToBounds = false
+        }
+        guard let stackView = stackView else {
+            return []
         }
         stackView.addArrangedSubview(label)
 
         return [
             label.topAnchor.constraint(equalTo: stackView.topAnchor),
-            label.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -60)
+            label.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: labelTrailingAnchorConstant)
         ]
     }
 
-    private func returnIcon(stackView: UIStackView) -> [NSLayoutConstraint] {
-        let enabledButton = UIButton()
-        enabledButton.configureView { button in
-            button.imageView?.contentMode = .scaleAspectFit
+    private func returnIcon(stackView: UIStackView?) -> [NSLayoutConstraint] {
+        let button = UIButton()
+        button.configureView { button in
+            button.setImage(self.favoriteState ? filledHeartIcon : outlinedHeartIcon, for: .normal)
+            button.addTarget(self, action: #selector(clickedFavorite), for: .touchUpInside)
         }
-        let filledIcon = filledHeartIcon
-        enabledButton.isHidden = true
-        enabledButton.setImage(filledIcon, for: .normal)
-        enabledButton.addTarget(self, action: #selector(clickedFavorite), for: .touchUpInside)
-        favoriteEnabledButton = enabledButton
-
-        let disabledButton = UIButton()
-        disabledButton.configureView { button in
-            button.imageView?.contentMode = .scaleAspectFit
+        guard let stackView = stackView else {
+            return []
         }
-        let outlinedIcon = outlinedHeartIcon
-        disabledButton.setImage(outlinedIcon, for: .normal)
-        disabledButton.isHidden = false
-        disabledButton.addTarget(self, action: #selector(clickedFavorite), for: .touchUpInside)
-        favoriteDisabledButton = disabledButton
-
-        stackView.addArrangedSubview(enabledButton)
-        stackView.addArrangedSubview(disabledButton)
+        stackView.addArrangedSubview(button)
+        favoriteButton = button
 
         return [
-            enabledButton.topAnchor.constraint(equalTo: stackView.topAnchor),
-            disabledButton.topAnchor.constraint(equalTo: stackView.topAnchor)
+            button.topAnchor.constraint(equalTo: stackView.topAnchor)
         ]
     }
 
-    private func setupImageView(stackView _: UIStackView?) -> [NSLayoutConstraint] {
+    private func setupImageView() -> [NSLayoutConstraint] {
         let imageView = UIImageView()
         imageView.configureView { imageView in
             imageView.clipsToBounds = true
@@ -129,24 +119,20 @@ class PhotoViewerVC: UIViewController {
     }
 
     @objc func clickedFavorite() {
-        guard let favoriteEnabledButton = favoriteEnabledButton, let favoriteDisabledButton = favoriteDisabledButton else {
+        guard let favoriteButton = favoriteButton, let imageTitle = imageTitle else {
             return
         }
-        guard let imageTitle = imageTitle else {
-            return
-        }
-
-        if favoriteEnabledButton.isHidden == true {
-            self.favoriteEnabledButton?.isHidden = !favoriteEnabledButton.isHidden
-            self.favoriteDisabledButton?.isHidden = !favoriteDisabledButton.isHidden
-            if let pngImage = imageView?.image?.pngData() {
-                UserDefaults.standard.set(pngImage, forKey: imageTitle)
-            }
-        } else {
-            self.favoriteEnabledButton?.isHidden = !favoriteEnabledButton.isHidden
-            self.favoriteDisabledButton?.isHidden = !favoriteDisabledButton.isHidden
+        if favoriteState {
+            favoriteButton.setImage(outlinedHeartIcon, for: .normal)
             if UserDefaults.standard.object(forKey: imageTitle) != nil {
                 UserDefaults.standard.removeObject(forKey: imageTitle)
+                favoriteState = false
+            }
+        } else {
+            favoriteButton.setImage(filledHeartIcon, for: .normal)
+            if let pngImage = imageView?.image?.pngData() {
+                UserDefaults.standard.set(pngImage, forKey: imageTitle)
+                favoriteState = true
             }
         }
         return
@@ -159,3 +145,9 @@ private let viewBackgroundColor = R.color.viewBackground()
 private let imageViewBackgroundColor = R.color.tabBarBackground()
 private let filledHeartIcon = R.image.heartFilled()
 private let outlinedHeartIcon = R.image.heartOutlined()
+private let stackViewSpacing: CGFloat = 20
+private let stackViewLeadingAnchorConstant: CGFloat = 15
+private let stackViewTrailingAnchorConstant: CGFloat = -15
+private let stackViewTopAnchorConstant: CGFloat = 20
+private let labelFontSize: CGFloat = 20
+private let labelTrailingAnchorConstant: CGFloat = -60

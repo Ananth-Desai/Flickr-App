@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Unfilled Heart Icon.png",
+      "filename" : "Heart Outlined.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Unfilled Heart Icon@2x.png",
+      "filename" : "Heart Outlined@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Unfilled Heart Icon@3x.png",
+      "filename" : "Heart Outlined@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

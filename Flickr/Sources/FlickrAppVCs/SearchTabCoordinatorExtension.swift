@@ -18,7 +18,7 @@ extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
 
 extension SearchTabCoordinator: SearchResultsViewControllerDelegate {
     func didSelectImage(url: URL, title: String, imageTitle: String) {
-        let photoViewerVC = PhotoViewerVC(url: url, title: title, imageTitle: imageTitle)
+        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle)
         photoViewerVC.title = title
         rootNavigationController?.pushViewController(photoViewerVC, animated: true)
     }
