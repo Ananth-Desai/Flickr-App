@@ -11,11 +11,12 @@ import UIKit
 
 class PhotoViewerVC: UIViewController {
     private var url: URL
+    private var favouriteState: Bool?
     private var imageTitle: String?
     private weak var stackView: UIStackView?
     private weak var imageView: UIImageView?
-    private weak var favoriteButton: UIButton?
-    private var favouriteState: Bool?
+    private weak var favoriteEnabledButton: UIButton?
+    private weak var favoriteDisabledButton: UIButton?
 
     init(url: URL, title _: String, imageTitle: String) {
         self.url = url
@@ -42,15 +43,15 @@ class PhotoViewerVC: UIViewController {
         let stackView = UIStackView()
         stackView.configureView { stackView in
             stackView.axis = .horizontal
-            stackView.distribution = .fillProportionally
-            stackView.contentMode = .scaleAspectFill
+            stackView.alignment = .fill
+            stackView.distribution = .fill
             stackView.spacing = 20
         }
         self.stackView = stackView
-        let iconConstraints = returnIcon(stackView: stackView)
-        NSLayoutConstraint.activate(iconConstraints)
         let labelConstraints = returnLabel(stackView: stackView)
         NSLayoutConstraint.activate(labelConstraints)
+        let iconConstraints = returnIcon(stackView: stackView)
+        NSLayoutConstraint.activate(iconConstraints)
         view.addSubview(stackView)
 
         guard let imageView = imageView else {
@@ -71,24 +72,40 @@ class PhotoViewerVC: UIViewController {
             label.clipsToBounds = false
         }
         stackView.addArrangedSubview(label)
+
         return [
-            label.leadingAnchor.constraint(equalTo: stackView.leadingAnchor),
+            label.topAnchor.constraint(equalTo: stackView.topAnchor),
+            label.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -60),
         ]
     }
 
     private func returnIcon(stackView: UIStackView) -> [NSLayoutConstraint] {
-        let button = UIButton()
-        button.configureView { button in
-            button.imageView?.contentMode = .scaleAspectFill
+        let enabledButton = UIButton()
+        enabledButton.configureView { button in
+            button.imageView?.contentMode = .scaleAspectFit
         }
-        let icon = favouriteState! ? filledHeartIcon : outlinedHeartIcon
-        button.setImage(icon, for: .normal)
-        button.addTarget(self, action: #selector(clickedFavorite), for: .touchUpInside)
-        favoriteButton = button
-        stackView.addSubview(button)
+        let filledIcon = filledHeartIcon
+        enabledButton.isHidden = true
+        enabledButton.setImage(filledIcon, for: .normal)
+        enabledButton.addTarget(self, action: #selector(clickedFavorite), for: .touchUpInside)
+        favoriteEnabledButton = enabledButton
+
+        let disabledButton = UIButton()
+        disabledButton.configureView { button in
+            button.imageView?.contentMode = .scaleAspectFit
+        }
+        let outlinedIcon = outlinedHeartIcon
+        disabledButton.setImage(outlinedIcon, for: .normal)
+        disabledButton.isHidden = false
+        disabledButton.addTarget(self, action: #selector(clickedFavorite), for: .touchUpInside)
+        favoriteDisabledButton = disabledButton
+
+        stackView.addArrangedSubview(enabledButton)
+        stackView.addArrangedSubview(disabledButton)
 
         return [
-            button.trailingAnchor.constraint(equalTo: stackView.trailingAnchor)
+            enabledButton.topAnchor.constraint(equalTo: stackView.topAnchor),
+            disabledButton.topAnchor.constraint(equalTo: stackView.topAnchor)
         ]
     }
 
@@ -112,10 +129,27 @@ class PhotoViewerVC: UIViewController {
     }
 
     @objc func clickedFavorite() {
-        guard let favouriteState = favouriteState else {
+        guard let favoriteEnabledButton = favoriteEnabledButton, let favoriteDisabledButton = favoriteDisabledButton else {
             return
         }
-        self.favouriteState = !favouriteState
+        guard let imageTitle = imageTitle else {
+            return
+        }
+
+        if favoriteEnabledButton.isHidden == true {
+            self.favoriteEnabledButton?.isHidden = !favoriteEnabledButton.isHidden
+            self.favoriteDisabledButton?.isHidden = !favoriteDisabledButton.isHidden
+            if let pngImage = imageView?.image?.pngData() {
+                UserDefaults.standard.set(pngImage, forKey: imageTitle)
+            }
+        } else {
+            self.favoriteEnabledButton?.isHidden = !favoriteEnabledButton.isHidden
+            self.favoriteDisabledButton?.isHidden = !favoriteDisabledButton.isHidden
+            if let _ = UserDefaults.standard.object(forKey: imageTitle) as? Data {
+                UserDefaults.standard.removeObject(forKey: imageTitle)
+            }
+        }
+        return
     }
 }
 
