@@ -75,7 +75,7 @@ class PhotoViewerVC: UIViewController {
 
         return [
             label.topAnchor.constraint(equalTo: stackView.topAnchor),
-            label.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -60),
+            label.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -60)
         ]
     }
 
@@ -145,7 +145,7 @@ class PhotoViewerVC: UIViewController {
         } else {
             self.favoriteEnabledButton?.isHidden = !favoriteEnabledButton.isHidden
             self.favoriteDisabledButton?.isHidden = !favoriteDisabledButton.isHidden
-            if let _ = UserDefaults.standard.object(forKey: imageTitle) as? Data {
+            if UserDefaults.standard.object(forKey: imageTitle) != nil {
                 UserDefaults.standard.removeObject(forKey: imageTitle)
             }
         }
