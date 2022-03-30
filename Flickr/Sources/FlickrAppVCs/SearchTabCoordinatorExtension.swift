@@ -36,10 +36,8 @@ extension SearchTabCoordinator: PhotoViewerViewControllerDelegate {
         guard let favoriteArray = favoritesArray else {
             return
         }
-        for photo in favoriteArray {
-            if photo.imageTitle != title {
-                newFavoriteArray?.append(photo)
-            }
+        for photo in favoriteArray where photo.imageTitle != title {
+            newFavoriteArray?.append(photo)
         }
         favoritesArray = newFavoriteArray
     }

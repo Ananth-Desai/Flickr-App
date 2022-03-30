@@ -146,7 +146,7 @@ class PhotoViewerVC: UIViewController {
 // MARK: Constants
 
 private let viewBackgroundColor = R.color.viewBackground()
-private let imageViewBackgroundColor = R.color.tabBarBackground()
+private let imageViewBackgroundColor = R.color.viewBackground()
 private let filledHeartIcon = R.image.heartFilled()
 private let outlinedHeartIcon = R.image.heartOutlined()
 private let stackViewSpacing: CGFloat = 20

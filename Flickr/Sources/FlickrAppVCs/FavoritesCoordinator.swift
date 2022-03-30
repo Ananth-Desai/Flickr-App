@@ -9,10 +9,10 @@ import Foundation
 import UIKit
 
 class FavoritesCoordinator {
-    weak var SearchTabCoordinatorReference: SearchTabCoordinator?
+    weak var searchTabCoordinatorReference: SearchTabCoordinator?
 
     init(searchTabCoordinatorReference: SearchTabCoordinator?) {
-        SearchTabCoordinatorReference = searchTabCoordinatorReference
+        self.searchTabCoordinatorReference = searchTabCoordinatorReference
     }
 
     func returnRootNavigator() -> UINavigationController {

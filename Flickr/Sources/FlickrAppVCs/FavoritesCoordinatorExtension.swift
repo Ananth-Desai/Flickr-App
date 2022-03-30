@@ -9,6 +9,6 @@ import Foundation
 
 extension FavoritesCoordinator: FavoritesViewControllerDelegate {
     func getFavoritesArray() -> [FavoriteImageStructure]? {
-        SearchTabCoordinatorReference?.favoritesArray
+        searchTabCoordinatorReference?.favoritesArray
     }
 }
