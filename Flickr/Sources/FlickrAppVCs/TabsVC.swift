@@ -26,7 +26,7 @@ class TabsVC: UITabBarController {
         let searchVC = searchCoordinator.returnRootNavigator()
         searchVC.tabBarItem = UITabBarItem(title: homeVcTitle, image: searchIcon, tag: 0)
 
-        let favoritesCoordinator = FavoritesCoordinator()
+        let favoritesCoordinator = FavoritesCoordinator(searchTabCoordinatorReference: searchCoordinator)
         self.favoritesCoordinator = favoritesCoordinator
         let favoritesVC = favoritesCoordinator.returnRootNavigator()
         favoritesVC.tabBarItem = UITabBarItem(title: favoritesVcTitle, image: favoritesIcon, tag: 0)

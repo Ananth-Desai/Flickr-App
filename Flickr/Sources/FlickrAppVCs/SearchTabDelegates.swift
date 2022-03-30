@@ -14,3 +14,8 @@ protocol SearchScreenViewControllerDelegate: AnyObject {
 protocol SearchResultsViewControllerDelegate: AnyObject {
     func didSelectImage(url: URL, title: String, imageTitle: String)
 }
+
+protocol PhotoViewerViewControllerDelegate: AnyObject {
+    func pushToFavorites(url: URL, title: String)
+    func popFromFavorites(url: URL, title: String)
+}

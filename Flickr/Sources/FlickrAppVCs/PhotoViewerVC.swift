@@ -16,6 +16,7 @@ class PhotoViewerVC: UIViewController {
     private weak var stackView: UIStackView?
     private weak var imageView: UIImageView?
     private weak var favoriteButton: UIButton?
+    weak var photoViewerDelegate: PhotoViewerViewControllerDelegate?
 
     init(url: URL, imageTitle: String) {
         self.url = url
@@ -127,12 +128,14 @@ class PhotoViewerVC: UIViewController {
             favoriteButton.setImage(outlinedHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
             if UserDefaults.standard.object(forKey: imageTitle) != nil {
                 UserDefaults.standard.removeObject(forKey: imageTitle)
+                photoViewerDelegate?.popFromFavorites(url: url, title: imageTitle)
                 favoriteState = false
             }
         } else {
             favoriteButton.setImage(filledHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
             if let pngImage = imageView?.image?.pngData() {
                 UserDefaults.standard.set(pngImage, forKey: imageTitle)
+                photoViewerDelegate?.pushToFavorites(url: url, title: imageTitle)
                 favoriteState = true
             }
         }

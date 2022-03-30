@@ -30,4 +30,9 @@ struct SinglePhoto: Codable {
 struct FavoriteImageStructure {
     var imageTitle: String
     var url: URL
+
+    init(url: URL, title: String) {
+        imageTitle = title
+        self.url = url
+    }
 }

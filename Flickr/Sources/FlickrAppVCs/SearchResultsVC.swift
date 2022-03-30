@@ -177,7 +177,6 @@ extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate,
 private let navigationBarTitleColor = R.color.navigationBarTintColor()
 private let viewBackgroundColor = R.color.viewBackground()
 private let cellHeight: CGFloat = 120
-private let cellWidth: CGFloat = 128
 private let placeholderCount = 20
 private let cellReuseIdentifier = "customCell"
 private let minimumInteritemSpacing: CGFloat = 3

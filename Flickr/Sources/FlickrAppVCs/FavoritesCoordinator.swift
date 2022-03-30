@@ -9,9 +9,16 @@ import Foundation
 import UIKit
 
 class FavoritesCoordinator {
+    weak var SearchTabCoordinatorReference: SearchTabCoordinator?
+
+    init(searchTabCoordinatorReference: SearchTabCoordinator?) {
+        SearchTabCoordinatorReference = searchTabCoordinatorReference
+    }
+
     func returnRootNavigator() -> UINavigationController {
         let favoritesVC = FavoritesVC()
         favoritesVC.title = favoritesVcTitle
+        favoritesVC.favoritesDelegate = self
         let rootNav = UINavigationController(rootViewController: favoritesVC)
         if #available(iOS 13.0, *) {
             let navbarAppearance = UINavigationBarAppearance()

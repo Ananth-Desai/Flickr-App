@@ -20,6 +20,27 @@ extension SearchTabCoordinator: SearchResultsViewControllerDelegate {
     func didSelectImage(url: URL, title: String, imageTitle: String) {
         let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle)
         photoViewerVC.title = title
+        photoViewerVC.photoViewerDelegate = self
         rootNavigationController?.pushViewController(photoViewerVC, animated: true)
+    }
+}
+
+extension SearchTabCoordinator: PhotoViewerViewControllerDelegate {
+    func pushToFavorites(url: URL, title: String) {
+        let image = FavoriteImageStructure(url: url, title: title)
+        favoritesArray?.append(image)
+    }
+
+    func popFromFavorites(url _: URL, title: String) {
+        var newFavoriteArray: [FavoriteImageStructure]? = []
+        guard let favoriteArray = favoritesArray else {
+            return
+        }
+        for photo in favoriteArray {
+            if photo.imageTitle != title {
+                newFavoriteArray?.append(photo)
+            }
+        }
+        favoritesArray = newFavoriteArray
     }
 }
