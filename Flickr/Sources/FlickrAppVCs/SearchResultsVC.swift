@@ -9,26 +9,6 @@ import Foundation
 import Nuke
 import UIKit
 
-struct Photos: Codable {
-    var photos: PhotoArray
-}
-
-struct PhotoArray: Codable {
-    var photo: [SinglePhoto]
-
-    func getPhotoArray() -> [SinglePhoto] {
-        photo
-    }
-}
-
-struct SinglePhoto: Codable {
-    var id: String
-    var owner: String
-    var secret: String
-    var server: String
-    var title: String
-}
-
 class SearchResultsVC: UIViewController {
     private var photos: [URL] = []
     private var imageTitles: [String] = []
@@ -128,7 +108,7 @@ class SearchResultsVC: UIViewController {
         collectionViewLayout.minimumInteritemSpacing = minimumInteritemSpacing
         collectionViewLayout.minimumLineSpacing = minimumLineSpacing
         collectionViewLayout.sectionInset = sectionInset
-        collectionViewLayout.itemSize = CGSize(width: view.frame.width / widthDivisor, height: cellHeight)
+        collectionViewLayout.itemSize = CGSize(width: (view.frame.width - 6) / 3, height: cellHeight)
         return collectionViewLayout
     }
 
@@ -197,9 +177,9 @@ extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate,
 private let navigationBarTitleColor = R.color.navigationBarTintColor()
 private let viewBackgroundColor = R.color.viewBackground()
 private let cellHeight: CGFloat = 120
+private let cellWidth: CGFloat = 128
 private let placeholderCount = 20
 private let cellReuseIdentifier = "customCell"
 private let minimumInteritemSpacing: CGFloat = 3
 private let minimumLineSpacing: CGFloat = 3
 private let sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-private let widthDivisor = 3.2

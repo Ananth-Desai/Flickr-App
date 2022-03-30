@@ -83,10 +83,11 @@ class PhotoViewerVC: UIViewController {
     }
 
     private func returnIcon(stackView: UIStackView?) -> [NSLayoutConstraint] {
-        let button = UIButton()
+        let button = UIButton(type: .custom)
         button.configureView { button in
-            button.setImage(self.favoriteState ? filledHeartIcon : outlinedHeartIcon, for: .normal)
+            button.setImage(self.favoriteState ? filledHeartIcon?.withRenderingMode(.alwaysTemplate) : outlinedHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
             button.addTarget(self, action: #selector(clickedFavorite), for: .touchUpInside)
+            button.imageView?.tintColor = favoriteToggleButtonTintColor
         }
         guard let stackView = stackView else {
             return []
@@ -123,13 +124,13 @@ class PhotoViewerVC: UIViewController {
             return
         }
         if favoriteState {
-            favoriteButton.setImage(outlinedHeartIcon, for: .normal)
+            favoriteButton.setImage(outlinedHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
             if UserDefaults.standard.object(forKey: imageTitle) != nil {
                 UserDefaults.standard.removeObject(forKey: imageTitle)
                 favoriteState = false
             }
         } else {
-            favoriteButton.setImage(filledHeartIcon, for: .normal)
+            favoriteButton.setImage(filledHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
             if let pngImage = imageView?.image?.pngData() {
                 UserDefaults.standard.set(pngImage, forKey: imageTitle)
                 favoriteState = true
@@ -151,3 +152,4 @@ private let stackViewTrailingAnchorConstant: CGFloat = -15
 private let stackViewTopAnchorConstant: CGFloat = 20
 private let labelFontSize: CGFloat = 20
 private let labelTrailingAnchorConstant: CGFloat = -60
+private let favoriteToggleButtonTintColor = R.color.favouriteToggleButtonTintColor()
