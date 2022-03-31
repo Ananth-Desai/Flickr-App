@@ -13,9 +13,9 @@ class PhotoViewerVC: UIViewController {
     private var url: URL
     private var favoriteState: Bool
     private var imageTitle: String?
-    private weak var stackView: UIStackView?
-    private weak var imageView: UIImageView?
-    private weak var favoriteButton: UIButton?
+    private weak var stackView: UIStackView!
+    private weak var imageView: UIImageView!
+    private weak var favoriteButton: UIButton!
 
     init(url: URL, imageTitle: String) {
         self.url = url

@@ -9,10 +9,14 @@ import Foundation
 import LeoUI
 import UIKit
 
+protocol SearchScreenViewControllerDelegate: AnyObject {
+    func didTapSearchButton(searchString: String)
+}
+
 class SearchScreenVC: UIViewController {
-    private weak var progressButton: ProgressButton?
-    private weak var searchButton: UIButton?
-    private weak var searchBar: UISearchBar?
+    private weak var progressButton: ProgressButton!
+    private weak var searchButton: UIButton!
+    private weak var searchBar: UISearchBar!
     weak var searchScreenDelegate: SearchScreenViewControllerDelegate?
 
     override func viewDidLoad() {
