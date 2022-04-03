@@ -8,5 +8,8 @@
 import Foundation
 
 protocol FavoritesViewControllerDelegate: AnyObject {
-    func getFavoritesArray() -> [FavoriteImageStructure]?
+    func getFavoritesArray() -> [FavoriteImageData]?
+    func selectedImageFromFavorites(imageData: Data, imageTitle: String, imageId: String)
+    func pushToFavorites(imageData: Data, id: String, title: String)
+    func popFromFavorites(id: String)
 }

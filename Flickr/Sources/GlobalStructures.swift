@@ -27,12 +27,22 @@ struct SinglePhoto: Codable {
     var title: String
 }
 
-struct FavoriteImageStructure {
+struct FavoriteImageData: Codable {
+    var imageId: String
     var imageTitle: String
-    var url: URL
+    var imageData: Data
 
-    init(url: URL, title: String) {
-        imageTitle = title
-        self.url = url
+    init(imageId: String, imageData: Data, imageTitle: String) {
+        self.imageData = imageData
+        self.imageTitle = imageTitle
+        self.imageId = imageId
+    }
+}
+
+struct FavoriteImagesArray: Codable {
+    var array: [FavoriteImageData]
+
+    init(array: [FavoriteImageData]) {
+        self.array = array
     }
 }

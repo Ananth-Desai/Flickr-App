@@ -10,6 +10,7 @@ import UIKit
 
 class FavoritesCoordinator {
     weak var searchTabCoordinatorReference: SearchTabCoordinator?
+    weak var rootNavigationController: UINavigationController!
 
     init(searchTabCoordinatorReference: SearchTabCoordinator?) {
         self.searchTabCoordinatorReference = searchTabCoordinatorReference
@@ -29,6 +30,7 @@ class FavoritesCoordinator {
             // Fallback on earlier versions
             rootNav.navigationBar.backgroundColor = navigationBarBackgroundColor
         }
+        rootNavigationController = rootNav
         return rootNav
     }
 }

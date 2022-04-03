@@ -14,11 +14,13 @@ class FavoritesVC: UIViewController {
     private weak var collectionView: UICollectionView?
     private weak var textView: UILabel?
     private var isFavouritesEmpty: Bool?
-    private var favoritesArray: [FavoriteImageStructure]?
+    private var favoritesArray: [FavoriteImageData]?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = viewBackgroundColor
+        navigationController?.navigationBar.tintColor = navigationBarTitleColor
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         let array = favoritesDelegate?.getFavoritesArray()
         favoritesArray = array
         guard let array = array else {
@@ -44,7 +46,7 @@ class FavoritesVC: UIViewController {
         }
     }
 
-    private func setupView(favoritesArray: [FavoriteImageStructure]?) -> [NSLayoutConstraint] {
+    private func setupView(favoritesArray: [FavoriteImageData]?) -> [NSLayoutConstraint] {
         guard let favoritesArray = favoritesArray else {
             return []
         }
@@ -57,7 +59,7 @@ class FavoritesVC: UIViewController {
         }
     }
 
-    private func checkAndResetViews(favoritesArray: [FavoriteImageStructure]?) {
+    private func checkAndResetViews(favoritesArray: [FavoriteImageData]?) {
         guard let favoritesArray = favoritesArray else {
             return
         }
@@ -151,7 +153,7 @@ class FavoritesVC: UIViewController {
 extension FavoritesVC: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
         guard let favoritesArray = favoritesDelegate?.getFavoritesArray() else {
-            return 20
+            return 0
         }
         return favoritesArray.count
     }
@@ -161,7 +163,7 @@ extension FavoritesVC: UICollectionViewDataSource, UICollectionViewDelegate {
         guard let favoritesArray = favoritesDelegate?.getFavoritesArray() else {
             return cell
         }
-        let imageData = UserDefaults.standard.object(forKey: favoritesArray[indexPath.row].imageTitle) as? Data
+        let imageData = favoritesArray[indexPath.row].imageData
         let imageView = returnImageView(cell: cell, indexPath: indexPath, imageData: imageData)
         guard let imageView = imageView else {
             return cell
@@ -172,11 +174,19 @@ extension FavoritesVC: UICollectionViewDataSource, UICollectionViewDelegate {
 
         return cell
     }
+
+    func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let favoritesArray = favoritesDelegate?.getFavoritesArray() else {
+            return
+        }
+        favoritesDelegate?.selectedImageFromFavorites(imageData: favoritesArray[indexPath.row].imageData, imageTitle: favoritesArray[indexPath.row].imageTitle, imageId: favoritesArray[indexPath.row].imageId)
+    }
 }
 
 // MARK: Constants
 
 private let textFieldColor = R.color.favoritesDefaultText()
+private let navigationBarTitleColor = R.color.navigationBarTintColor()
 private let viewBackgroundColor = R.color.viewBackground()
 private let textNumberOfLines = 3
 private let favoritesDefaultText = R.string.localizable.defaultText()

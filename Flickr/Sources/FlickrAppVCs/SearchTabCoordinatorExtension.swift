@@ -17,8 +17,8 @@ extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
 }
 
 extension SearchTabCoordinator: SearchResultsViewControllerDelegate {
-    func didSelectImage(url: URL, title: String, imageTitle: String) {
-        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle)
+    func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String) {
+        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil)
         photoViewerVC.title = title
         photoViewerVC.photoViewerDelegate = self
         rootNavigationController?.pushViewController(photoViewerVC, animated: true)
@@ -26,19 +26,25 @@ extension SearchTabCoordinator: SearchResultsViewControllerDelegate {
 }
 
 extension SearchTabCoordinator: PhotoViewerViewControllerDelegate {
-    func pushToFavorites(url: URL, title: String) {
-        let image = FavoriteImageStructure(url: url, title: title)
-        favoritesArray?.append(image)
+    func pushToFavorites(imageData: Data, id: String, title: String) {
+        var favorites = FavoriteImagesArray(array: [])
+        let newArray = FileManagerCoordinator.retrieveData() ?? []
+        favorites.array = newArray
+        let image = FavoriteImageData(imageId: id, imageData: imageData, imageTitle: title)
+        favorites.array.append(image)
+        favoritesArray = favorites
+        FileManagerCoordinator.storeData(favoritesArray)
     }
 
-    func popFromFavorites(url _: URL, title: String) {
-        var newFavoriteArray: [FavoriteImageStructure]? = []
-        guard let favoriteArray = favoritesArray else {
+    func popFromFavorites(id: String) {
+        var newFavoriteArray = FavoriteImagesArray(array: [])
+        guard let favoriteArray = FileManagerCoordinator.retrieveData() else {
             return
         }
-        for photo in favoriteArray where photo.imageTitle != title {
-            newFavoriteArray?.append(photo)
+        for photo in favoriteArray where photo.imageId != id {
+            newFavoriteArray.array.append(photo)
         }
         favoritesArray = newFavoriteArray
+        FileManagerCoordinator.storeData(favoritesArray)
     }
 }

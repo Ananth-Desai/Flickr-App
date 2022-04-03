@@ -12,6 +12,7 @@ import UIKit
 class SearchResultsVC: UIViewController {
     private var photos: [URL] = []
     private var imageTitles: [String] = []
+    private var imageIDs: [String] = []
     private var searchString: String?
     private var collectionView: UICollectionView?
     private var constants = GlobalConstants()
@@ -72,6 +73,7 @@ class SearchResultsVC: UIViewController {
             }
             individualPhotoUrls.append(imageUrl)
             imageTitles.append(photo.title)
+            imageIDs.append(photo.id)
         }
         return individualPhotoUrls
     }
@@ -168,7 +170,7 @@ extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate,
         guard let searchString = self.searchString, photos.isEmpty == false else {
             return
         }
-        searchResultsDelegate?.didSelectImage(url: photos[indexPath.row], title: searchString, imageTitle: imageTitles[indexPath.row])
+        searchResultsDelegate?.didSelectImage(url: photos[indexPath.row], title: searchString, imageTitle: imageTitles[indexPath.row], imageId: imageIDs[indexPath.row])
     }
 }
 

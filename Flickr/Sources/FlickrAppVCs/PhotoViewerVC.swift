@@ -10,23 +10,33 @@ import Nuke
 import UIKit
 
 class PhotoViewerVC: UIViewController {
-    private var url: URL
-    private var favoriteState: Bool
-    private var imageTitle: String?
+    private var url: URL?
+    private var imageData: Data?
+    private var favoriteState: Bool = false
+    private var imageTitle: String
+    private var imageId: String
     private weak var stackView: UIStackView?
     private weak var imageView: UIImageView?
     private weak var favoriteButton: UIButton?
     weak var photoViewerDelegate: PhotoViewerViewControllerDelegate?
+    weak var favoritesDelegate: FavoritesViewControllerDelegate?
 
-    init(url: URL, imageTitle: String) {
-        self.url = url
-        self.imageTitle = imageTitle
-        if UserDefaults.standard.object(forKey: imageTitle) != nil {
-            favoriteState = true
+    init(url: URL?, imageTitle: String, imageId: String, imageData: Data?) {
+        if url != nil {
+            self.url = url
         } else {
-            favoriteState = false
+            self.imageData = imageData
         }
+        self.imageTitle = imageTitle
+        self.imageId = imageId
         super.init(nibName: nil, bundle: nil)
+        let favoritesArray = FileManagerCoordinator.retrieveData()
+        guard let favoritesArray = favoritesArray else {
+            return
+        }
+        for image in favoritesArray where image.imageId == imageId {
+            favoriteState = true
+        }
     }
 
     @available(*, unavailable)
@@ -54,7 +64,6 @@ class PhotoViewerVC: UIViewController {
         }
         self.stackView = stackView
         view.addSubview(stackView)
-
         guard let imageView = imageView else {
             return []
         }
@@ -109,7 +118,17 @@ class PhotoViewerVC: UIViewController {
             imageView.backgroundColor = imageViewBackgroundColor
         }
         self.imageView = imageView
-        Nuke.loadImage(with: url, into: imageView)
+        if url != nil {
+            guard let url = url else {
+                return []
+            }
+            Nuke.loadImage(with: url, into: imageView)
+        } else {
+            guard let imageData = imageData else {
+                return []
+            }
+            imageView.image = UIImage(data: imageData)
+        }
         view.addSubview(imageView)
 
         return [
@@ -121,21 +140,25 @@ class PhotoViewerVC: UIViewController {
     }
 
     @objc func clickedFavorite() {
-        guard let favoriteButton = favoriteButton, let imageTitle = imageTitle else {
+        guard let favoriteButton = favoriteButton else {
             return
         }
         if favoriteState {
             favoriteButton.setImage(outlinedHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
-            if UserDefaults.standard.object(forKey: imageTitle) != nil {
-                UserDefaults.standard.removeObject(forKey: imageTitle)
-                photoViewerDelegate?.popFromFavorites(url: url, title: imageTitle)
-                favoriteState = false
+            if photoViewerDelegate != nil {
+                photoViewerDelegate?.popFromFavorites(id: imageId)
+            } else {
+                favoritesDelegate?.popFromFavorites(id: imageId)
             }
+            favoriteState = false
         } else {
             favoriteButton.setImage(filledHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
             if let pngImage = imageView?.image?.pngData() {
-                UserDefaults.standard.set(pngImage, forKey: imageTitle)
-                photoViewerDelegate?.pushToFavorites(url: url, title: imageTitle)
+                if photoViewerDelegate != nil {
+                    photoViewerDelegate?.pushToFavorites(imageData: pngImage, id: imageId, title: imageTitle)
+                } else {
+                    favoritesDelegate?.pushToFavorites(imageData: pngImage, id: imageId, title: imageTitle)
+                }
                 favoriteState = true
             }
         }

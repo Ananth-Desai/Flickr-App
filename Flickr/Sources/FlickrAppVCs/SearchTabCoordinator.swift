@@ -10,7 +10,7 @@ import UIKit
 
 class SearchTabCoordinator {
     weak var rootNavigationController: UINavigationController?
-    var favoritesArray: [FavoriteImageStructure]? = []
+    var favoritesArray: FavoriteImagesArray? = FavoriteImagesArray(array: [])
 
     private func returnSearchScreenVC() -> UIViewController {
         let searchScreenVC = SearchScreenVC()
