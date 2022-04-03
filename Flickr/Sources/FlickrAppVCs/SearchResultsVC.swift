@@ -9,12 +9,37 @@ import Foundation
 import Nuke
 import UIKit
 
+struct Photos: Codable {
+    var photos: PhotoArray
+}
+
+struct PhotoArray: Codable {
+    var photo: [SinglePhoto]
+
+    func getPhotoArray() -> [SinglePhoto] {
+        photo
+    }
+}
+
+struct SinglePhoto: Codable {
+    var id: String
+    var owner: String
+    var secret: String
+    var server: String
+    var title: String
+}
+
+protocol SearchResultsViewControllerDelegate: AnyObject {
+    func didSelectImage(url: URL, title: String, imageTitle: String)
+}
+
 class SearchResultsVC: UIViewController {
     private var photos: [URL] = []
     private var imageTitles: [String] = []
     private var imageIDs: [String] = []
     private var searchString: String?
-    private var collectionView: UICollectionView?
+    private var collectionView: UICollectionView!
+    private var progressView: UIActivityIndicatorView!
     private var constants = GlobalConstants()
     weak var searchResultsDelegate: SearchResultsViewControllerDelegate?
 
@@ -28,32 +53,14 @@ class SearchResultsVC: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func returnImageView(cell _: UICollectionViewCell, indexPath _: IndexPath) -> UIImageView {
-        let imageView = UIImageView()
-        imageView.configureView { imageView in
-            imageView.tag = 10
-            imageView.contentMode = .scaleAspectFill
-            imageView.clipsToBounds = true
-        }
-        return imageView
-    }
-
-    func returnImageViewConstraints(imageView: UIImageView, cell: UICollectionViewCell) -> [NSLayoutConstraint] {
-        [
-            imageView.leadingAnchor.constraint(equalTo: cell.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: cell.trailingAnchor),
-            imageView.topAnchor.constraint(equalTo: cell.topAnchor),
-            imageView.bottomAnchor.constraint(equalTo: cell.bottomAnchor)
-        ]
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = viewBackgroundColor
         navigationController?.navigationBar.tintColor = navigationBarTitleColor
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        let constraints = setupCollectionView()
-        NSLayoutConstraint.activate(constraints)
+        let collectionViewConstriants = setupCollectionView()
+        let progressViewConstraints = setupProgressView()
+        NSLayoutConstraint.activate(progressViewConstraints + collectionViewConstriants)
         fetchPhotos(searchString: searchString ?? "")
     }
 
@@ -98,11 +105,27 @@ class SearchResultsVC: UIViewController {
             }
             photosArray = self.constructIndividualUrls(result)
             self.photos = photosArray
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [self] in
+                progressView.stopAnimating()
+                collectionView.isHidden = false
                 self.collectionView?.reloadData()
             }
         })
         task.resume()
+    }
+
+    func setupProgressView() -> [NSLayoutConstraint] {
+        let progressView = UIActivityIndicatorView()
+        progressView.configureView { progressView in
+            progressView.startAnimating()
+            progressView.hidesWhenStopped = true
+        }
+        view.addSubview(progressView)
+        self.progressView = progressView
+        return [
+            progressView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            progressView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: progressViewCenterYAnchorConstant)
+        ]
     }
 
     func returnCollectionViewFlowLayout() -> UICollectionViewFlowLayout {
@@ -120,11 +143,11 @@ class SearchResultsVC: UIViewController {
         collectionView.configureView { collectionView in
             collectionView.delegate = self
             collectionView.dataSource = self
-            collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
+            collectionView.isHidden = true
+            collectionView.register(CustomCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
         }
         self.collectionView = collectionView
         view.addSubview(collectionView)
-
         return [
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
@@ -132,36 +155,18 @@ class SearchResultsVC: UIViewController {
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ]
     }
-
-    func returnSpinner(cell: UICollectionViewCell) -> [NSLayoutConstraint] {
-        let spinner = UIActivityIndicatorView()
-        spinner.configureView { spinner in
-            spinner.startAnimating()
-        }
-        cell.addSubview(spinner)
-        return [
-            spinner.centerXAnchor.constraint(equalTo: cell.centerXAnchor),
-            spinner.centerYAnchor.constraint(equalTo: cell.centerYAnchor)
-        ]
-    }
 }
 
 extension SearchResultsVC: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
-        photos.isEmpty ? 20 : photos.count
+        photos.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath)
-        if photos.isEmpty {
-            let spinnerConstraints = returnSpinner(cell: cell)
-            NSLayoutConstraint.activate(spinnerConstraints)
-        } else {
-            let imageView = returnImageView(cell: cell, indexPath: indexPath)
-            Nuke.loadImage(with: photos[indexPath.row], into: imageView)
-            cell.addSubview(imageView)
-            let imageViewConstraints = returnImageViewConstraints(imageView: imageView, cell: cell)
-            NSLayoutConstraint.activate(imageViewConstraints)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath) as? CustomCollectionViewCell
+        cell?.setupCollectionViewCell(photos: photos, indexPath: indexPath.row)
+        guard let cell = cell else {
+            return UICollectionViewCell()
         }
         return cell
     }
@@ -184,3 +189,4 @@ private let cellReuseIdentifier = "customCell"
 private let minimumInteritemSpacing: CGFloat = 3
 private let minimumLineSpacing: CGFloat = 3
 private let sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+private let progressViewCenterYAnchorConstant: CGFloat = -50
