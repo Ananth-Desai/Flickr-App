@@ -9,28 +9,8 @@ import Foundation
 import Nuke
 import UIKit
 
-struct Photos: Codable {
-    var photos: PhotoArray
-}
-
-struct PhotoArray: Codable {
-    var photo: [SinglePhoto]
-
-    func getPhotoArray() -> [SinglePhoto] {
-        photo
-    }
-}
-
-struct SinglePhoto: Codable {
-    var id: String
-    var owner: String
-    var secret: String
-    var server: String
-    var title: String
-}
-
 protocol SearchResultsViewControllerDelegate: AnyObject {
-    func didSelectImage(url: URL, title: String, imageTitle: String)
+    func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String)
 }
 
 class SearchResultsVC: UIViewController {

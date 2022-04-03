@@ -10,7 +10,7 @@ import Foundation
 class FileManagerCoordinator {
     static func storeData(_ favoritesData: FavoriteImagesArray?) {
         let searchDirectory = FileManager.SearchPathDirectory.documentDirectory
-        guard let url = FileManager.default.urls(for: searchDirectory, in: .userDomainMask).first?.appendingPathComponent("favorites.json", isDirectory: false) else {
+        guard let url = FileManager.default.urls(for: searchDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName, isDirectory: false) else {
             return
         }
         do {
@@ -26,7 +26,7 @@ class FileManagerCoordinator {
 
     static func retrieveData() -> [FavoriteImageData]? {
         let searchDirectory = FileManager.SearchPathDirectory.documentDirectory
-        guard let url = FileManager.default.urls(for: searchDirectory, in: .userDomainMask).first?.appendingPathComponent("favorites.json", isDirectory: false) else {
+        guard let url = FileManager.default.urls(for: searchDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName, isDirectory: false) else {
             return nil
         }
 
@@ -39,28 +39,13 @@ class FileManagerCoordinator {
                 decodedData = try JSONDecoder().decode(FavoriteImagesArray.self, from: data)
                 return decodedData?.array
             } catch {
-                print("Decoding Error")
+                return nil
             }
-        } else {
-            print("No Contents")
         }
         return nil
     }
-
-    static func removeData() {
-        let searchDirectory = FileManager.SearchPathDirectory.documentDirectory
-        guard let url = FileManager.default.urls(for: searchDirectory, in: .userDomainMask).first?.appendingPathComponent("favorites.json", isDirectory: false) else {
-            return
-        }
-        if FileManager.default.fileExists(atPath: url.path) {
-            do {
-                try FileManager.default.removeItem(at: url)
-                print("Deleted")
-            } catch {
-                print("Deleting Error")
-            }
-        } else {
-            print("File Doesn't exist")
-        }
-    }
 }
+
+// MARK: Constants
+
+private let fileName = "favorites.json"
