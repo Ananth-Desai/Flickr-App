@@ -9,10 +9,14 @@ import Foundation
 import LeoUI
 import UIKit
 
+protocol SearchScreenViewControllerDelegate: AnyObject {
+    func didTapSearchButton(searchString: String)
+}
+
 class SearchScreenVC: UIViewController {
-    private weak var progressButton: ProgressButton?
-    private weak var searchButton: UIButton?
-    private weak var searchBar: UISearchBar?
+    private weak var progressButton: ProgressButton!
+    private weak var searchButton: UIButton!
+    private weak var searchBar: UISearchBar!
     weak var searchScreenDelegate: SearchScreenViewControllerDelegate?
 
     override func viewDidLoad() {
@@ -46,7 +50,6 @@ class SearchScreenVC: UIViewController {
         searchBar.searchBarStyle = .minimal
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.placeholder = searchFieldPlaceholder
-        searchBar.backgroundColor = textFieldBackground
         searchBar.tintColor = textFieldTintColor
         searchBar.keyboardType = .default
         self.searchBar = searchBar
@@ -119,8 +122,6 @@ class SearchScreenVC: UIViewController {
             guard let searchBar = searchBar else {
                 return
             }
-            let apiCoordinator = ApiCoordinator()
-            apiCoordinator.fetchPhotos(searchString: searchBar.text ?? "")
             searchButton?.isHidden = true
             progressButton?.isHidden = false
             _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
@@ -137,13 +138,12 @@ class SearchScreenVC: UIViewController {
 
 // MARK: Constants
 
-private let viewBackgroundColor = returnColorPalette().viewBackgroundColor
-private let textFieldBackground = returnColorPalette().searchBarBackgroundColor
-private let textFieldIconColor = returnColorPalette().searchBarIconColor
+private let viewBackgroundColor = R.color.viewBackground()
+private let textFieldBackground = R.color.searchBarBackground()
 private let buttonRadius: CGFloat = 10
-private let enabledButtonColor = returnColorPalette().searchButtonEnbledBackground
-private let disabledButtonColor = returnColorPalette().searchButtonDisabledBackground
-private let textFieldTintColor = returnColorPalette().searchBarTintColor
+private let enabledButtonColor = R.color.searchButtonEnabled()
+private let disabledButtonColor = R.color.searchButtonDisabled()
+private let textFieldTintColor = R.color.searchBarIconColor()
 private let buttonEdgeInsets = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 20)
 private let searchBarCenterYAnchorConstant: CGFloat = -150
 private let searchBarLeadingAnchorConstant: CGFloat = 30
@@ -152,8 +152,8 @@ private let searchButtonCenterYAnchotConstant: CGFloat = -100
 private let progressButtonCenterYAnchorConstant: CGFloat = -100
 private let progressButtonLeadingAnchorConstant: CGFloat = -50
 private let progressButtonTrailingAnchorConstant: CGFloat = 50
-private let navigationBarTitleColor = returnColorPalette().navigationBarTitleColor
-private let navigationBarBackgroundColor = returnColorPalette().navigationBarBackground
+private let navigationBarTitleColor = R.color.navigationBarTintColor()
+private let navigationBarBackgroundColor = R.color.navigationBarBackground()
 private let searchFieldPlaceholder = R.string.localizable.searchFieldPlaceholder()
 private let searchButtonTitle = R.string.localizable.searchButtonTitle()
 private let searchBarKey = "searchField"

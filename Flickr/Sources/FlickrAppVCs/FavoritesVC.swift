@@ -38,8 +38,8 @@ class FavoritesVC: UIViewController {
 
 // MARK: Constants
 
-private let textFieldColor = returnColorPalette().favoritesDefaultTextColor
-private let viewBackgroundColor = returnColorPalette().viewBackgroundColor
+private let textFieldColor = R.color.favoritesDefaultText()
+private let viewBackgroundColor = R.color.viewBackground()
 private let textNumberOfLines = 3
 private let favoritesDefaultText = R.string.localizable.defaultText()
 private let favoritesDefaultTextFontName = "Arial"

@@ -43,9 +43,28 @@ class SearchTabCoordinator {
     }
 }
 
+// MARK: Extensions
+
+extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
+    func didTapSearchButton(searchString: String) {
+        let searchResultsVC = SearchResultsVC(searchString: searchString)
+        searchResultsVC.searchResultsDelegate = self
+        searchResultsVC.title = searchString
+        rootNavigationController?.pushViewController(searchResultsVC, animated: true)
+    }
+}
+
+extension SearchTabCoordinator: SearchResultsViewControllerDelegate {
+    func didSelectImage(url: URL, title: String, imageTitle: String) {
+        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle)
+        photoViewerVC.title = title
+        rootNavigationController?.pushViewController(photoViewerVC, animated: true)
+    }
+}
+
 // MARK: Constants
 
-private let navigationBarTitleColor = returnColorPalette().navigationBarTitleColor
-private let navigationBarBackgroundColor = returnColorPalette().navigationBarBackground
+private let navigationBarTitleColor = R.color.navigationBarTintColor()
+private let navigationBarBackgroundColor = R.color.navigationBarBackground()
 private let titleFontName = "Pacifico-Regular"
 private let title = "Flickr"
