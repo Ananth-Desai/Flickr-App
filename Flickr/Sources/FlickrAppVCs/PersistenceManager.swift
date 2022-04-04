@@ -7,7 +7,7 @@
 
 import Foundation
 
-class FileManagerCoordinator {
+class PersistenceManager {
     static func storeData(_ favoritesData: FavoriteImagesArray?) {
         let searchDirectory = FileManager.SearchPathDirectory.documentDirectory
         guard let url = FileManager.default.urls(for: searchDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName, isDirectory: false) else {

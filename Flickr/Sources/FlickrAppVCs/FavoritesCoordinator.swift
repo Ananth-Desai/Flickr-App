@@ -9,12 +9,7 @@ import Foundation
 import UIKit
 
 class FavoritesCoordinator {
-    weak var searchTabCoordinatorReference: SearchTabCoordinator?
     weak var rootNavigationController: UINavigationController!
-
-    init(searchTabCoordinatorReference: SearchTabCoordinator?) {
-        self.searchTabCoordinatorReference = searchTabCoordinatorReference
-    }
 
     func returnRootNavigator() -> UINavigationController {
         let favoritesVC = FavoritesVC()
@@ -38,34 +33,34 @@ class FavoritesCoordinator {
 // MARK: Extensions
 
 extension FavoritesCoordinator: FavoritesViewControllerDelegate {
-    func selectedImageFromFavorites(imageData: Data, imageTitle: String, imageId: String) {
+    func selectedImageFromFavoritesVC(imageData: Data, imageTitle: String, imageId: String) {
         let photoViewerVC = PhotoViewerVC(url: nil, imageTitle: imageTitle, imageId: imageId, imageData: imageData)
         photoViewerVC.title = ""
         photoViewerVC.favoritesDelegate = self
         rootNavigationController.pushViewController(photoViewerVC, animated: true)
     }
 
-    func getFavoritesArray() -> [FavoriteImageData]? {
-        FileManagerCoordinator.retrieveData()
+    func getFavoriteImagesFromStorage() -> [FavoriteImageData]? {
+        PersistenceManager.retrieveData()
     }
 
-    func pushToFavorites(imageData: Data, id: String, title: String) {
+    func storeImageAsFavorite(imageData: Data, id: String, title: String) {
         var favorites = FavoriteImagesArray(array: [])
-        favorites.array = FileManagerCoordinator.retrieveData() ?? []
+        favorites.array = PersistenceManager.retrieveData() ?? []
         let image = FavoriteImageData(imageId: id, imageData: imageData, imageTitle: title)
         favorites.array.append(image)
-        FileManagerCoordinator.storeData(favorites)
+        PersistenceManager.storeData(favorites)
     }
 
-    func popFromFavorites(id: String) {
+    func removeImageFromFavorite(id: String) {
         var newFavoriteArray = FavoriteImagesArray(array: [])
-        guard let favoriteArray = FileManagerCoordinator.retrieveData() else {
+        guard let favoriteArray = PersistenceManager.retrieveData() else {
             return
         }
         for photo in favoriteArray where photo.imageId != id {
             newFavoriteArray.array.append(photo)
         }
-        FileManagerCoordinator.storeData(newFavoriteArray)
+        PersistenceManager.storeData(newFavoriteArray)
     }
 }
 

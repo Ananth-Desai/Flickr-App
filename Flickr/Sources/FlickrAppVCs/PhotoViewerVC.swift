@@ -10,15 +10,15 @@ import Nuke
 import UIKit
 
 protocol FavoritesViewControllerDelegate: AnyObject {
-    func getFavoritesArray() -> [FavoriteImageData]?
-    func selectedImageFromFavorites(imageData: Data, imageTitle: String, imageId: String)
-    func pushToFavorites(imageData: Data, id: String, title: String)
-    func popFromFavorites(id: String)
+    func getFavoriteImagesFromStorage() -> [FavoriteImageData]?
+    func selectedImageFromFavoritesVC(imageData: Data, imageTitle: String, imageId: String)
+    func storeImageAsFavorite(imageData: Data, id: String, title: String)
+    func removeImageFromFavorite(id: String)
 }
 
 protocol PhotoViewerViewControllerDelegate: AnyObject {
-    func pushToFavorites(imageData: Data, id: String, title: String)
-    func popFromFavorites(id: String)
+    func storeImageAsFavorite(imageData: Data, id: String, title: String)
+    func removeImageFromFavorites(id: String)
 }
 
 class PhotoViewerVC: UIViewController {
@@ -42,7 +42,7 @@ class PhotoViewerVC: UIViewController {
         self.imageTitle = imageTitle
         self.imageId = imageId
         super.init(nibName: nil, bundle: nil)
-        let favoritesArray = FileManagerCoordinator.retrieveData()
+        let favoritesArray = PersistenceManager.retrieveData()
         guard let favoritesArray = favoritesArray else {
             return
         }
@@ -63,10 +63,12 @@ class PhotoViewerVC: UIViewController {
         let stackViewConstraints = setupStackView()
         let labelConstraints = returnLabel(stackView: stackView)
         let iconConstraints = returnIcon(stackView: stackView)
-        NSLayoutConstraint.activate(imageViewConstraints + stackViewConstraints + labelConstraints + iconConstraints)
+        if let labelConstraints = labelConstraints, let iconConstraints = iconConstraints, let stackViewConstraints = stackViewConstraints, let imageViewConstraints = imageViewConstraints {
+            NSLayoutConstraint.activate(imageViewConstraints + stackViewConstraints + labelConstraints + iconConstraints)
+        }
     }
 
-    private func setupStackView() -> [NSLayoutConstraint] {
+    private func setupStackView() -> [NSLayoutConstraint]? {
         let stackView = UIStackView()
         stackView.configureView { stackView in
             stackView.axis = .horizontal
@@ -76,53 +78,55 @@ class PhotoViewerVC: UIViewController {
         }
         self.stackView = stackView
         view.addSubview(stackView)
-        guard let imageView = imageView else {
-            return []
+        if let imageView = imageView {
+            return [
+                stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: stackViewLeadingAnchorConstant),
+                stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: stackViewTrailingAnchorConstant),
+                stackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: stackViewTopAnchorConstant)
+            ]
         }
         return [
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: stackViewLeadingAnchorConstant),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: stackViewTrailingAnchorConstant),
-            stackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: stackViewTopAnchorConstant)
+            stackView.topAnchor.constraint(equalTo: view.bottomAnchor)
         ]
     }
 
-    private func returnLabel(stackView: UIStackView?) -> [NSLayoutConstraint] {
+    private func returnLabel(stackView: UIStackView?) -> [NSLayoutConstraint]? {
         let label = UILabel()
         label.configureView { label in
             label.text = imageTitle
             label.font = label.font.withSize(labelFontSize)
             label.clipsToBounds = false
         }
-        guard let stackView = stackView else {
-            return []
+        if let stackView = stackView {
+            stackView.addArrangedSubview(label)
+            return [
+                label.topAnchor.constraint(equalTo: stackView.topAnchor),
+                label.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: labelTrailingAnchorConstant)
+            ]
         }
-        stackView.addArrangedSubview(label)
-
-        return [
-            label.topAnchor.constraint(equalTo: stackView.topAnchor),
-            label.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: labelTrailingAnchorConstant)
-        ]
+        return nil
     }
 
-    private func returnIcon(stackView: UIStackView?) -> [NSLayoutConstraint] {
+    private func returnIcon(stackView: UIStackView?) -> [NSLayoutConstraint]? {
         let button = UIButton(type: .custom)
         button.configureView { button in
             button.setImage(self.favoriteState ? filledHeartIcon?.withRenderingMode(.alwaysTemplate) : outlinedHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
             button.addTarget(self, action: #selector(clickedFavorite), for: .touchUpInside)
             button.imageView?.tintColor = favoriteToggleButtonTintColor
         }
-        guard let stackView = stackView else {
-            return []
-        }
-        stackView.addArrangedSubview(button)
         favoriteButton = button
-
-        return [
-            button.topAnchor.constraint(equalTo: stackView.topAnchor)
-        ]
+        if let stackView = stackView {
+            stackView.addArrangedSubview(button)
+            return [
+                button.topAnchor.constraint(equalTo: stackView.topAnchor)
+            ]
+        }
+        return nil
     }
 
-    private func setupImageView() -> [NSLayoutConstraint] {
+    private func setupImageView() -> [NSLayoutConstraint]? {
         let imageView = UIImageView()
         imageView.configureView { imageView in
             imageView.clipsToBounds = true
@@ -131,15 +135,13 @@ class PhotoViewerVC: UIViewController {
         }
         self.imageView = imageView
         if url != nil {
-            guard let url = url else {
-                return []
+            if let url = url {
+                Nuke.loadImage(with: url, into: imageView)
             }
-            Nuke.loadImage(with: url, into: imageView)
         } else {
-            guard let imageData = imageData else {
-                return []
+            if let imageData = imageData {
+                imageView.image = UIImage(data: imageData)
             }
-            imageView.image = UIImage(data: imageData)
         }
         view.addSubview(imageView)
 
@@ -158,18 +160,18 @@ class PhotoViewerVC: UIViewController {
         if favoriteState {
             favoriteButton.setImage(outlinedHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
             if photoViewerDelegate != nil {
-                photoViewerDelegate?.popFromFavorites(id: imageId)
+                photoViewerDelegate?.removeImageFromFavorites(id: imageId)
             } else {
-                favoritesDelegate?.popFromFavorites(id: imageId)
+                favoritesDelegate?.removeImageFromFavorite(id: imageId)
             }
             favoriteState = false
         } else {
             favoriteButton.setImage(filledHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
             if let pngImage = imageView?.image?.pngData() {
                 if photoViewerDelegate != nil {
-                    photoViewerDelegate?.pushToFavorites(imageData: pngImage, id: imageId, title: imageTitle)
+                    photoViewerDelegate?.storeImageAsFavorite(imageData: pngImage, id: imageId, title: imageTitle)
                 } else {
-                    favoritesDelegate?.pushToFavorites(imageData: pngImage, id: imageId, title: imageTitle)
+                    favoritesDelegate?.storeImageAsFavorite(imageData: pngImage, id: imageId, title: imageTitle)
                 }
                 favoriteState = true
             }

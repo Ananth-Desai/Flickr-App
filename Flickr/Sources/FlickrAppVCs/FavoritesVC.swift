@@ -21,7 +21,7 @@ class FavoritesVC: UIViewController {
         view.backgroundColor = viewBackgroundColor
         navigationController?.navigationBar.tintColor = navigationBarTitleColor
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        let array = favoritesDelegate?.getFavoritesArray()
+        let array = favoritesDelegate?.getFavoriteImagesFromStorage()
         favoritesArray = array
         guard let array = array else {
             return
@@ -36,7 +36,7 @@ class FavoritesVC: UIViewController {
     }
 
     override func viewDidAppear(_: Bool) {
-        let array = favoritesDelegate?.getFavoritesArray()
+        let array = favoritesDelegate?.getFavoriteImagesFromStorage()
         if favoritesArray?.count != array?.count {
             guard let array = array else {
                 return
@@ -152,7 +152,7 @@ class FavoritesVC: UIViewController {
 
 extension FavoritesVC: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
-        guard let favoritesArray = favoritesDelegate?.getFavoritesArray() else {
+        guard let favoritesArray = favoritesDelegate?.getFavoriteImagesFromStorage() else {
             return 0
         }
         return favoritesArray.count
@@ -160,7 +160,7 @@ extension FavoritesVC: UICollectionViewDataSource, UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath)
-        guard let favoritesArray = favoritesDelegate?.getFavoritesArray() else {
+        guard let favoritesArray = favoritesDelegate?.getFavoriteImagesFromStorage() else {
             return cell
         }
         let imageData = favoritesArray[indexPath.row].imageData
@@ -176,10 +176,10 @@ extension FavoritesVC: UICollectionViewDataSource, UICollectionViewDelegate {
     }
 
     func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let favoritesArray = favoritesDelegate?.getFavoritesArray() else {
+        guard let favoritesArray = favoritesDelegate?.getFavoriteImagesFromStorage() else {
             return
         }
-        favoritesDelegate?.selectedImageFromFavorites(imageData: favoritesArray[indexPath.row].imageData, imageTitle: favoritesArray[indexPath.row].imageTitle, imageId: favoritesArray[indexPath.row].imageId)
+        favoritesDelegate?.selectedImageFromFavoritesVC(imageData: favoritesArray[indexPath.row].imageData, imageTitle: favoritesArray[indexPath.row].imageTitle, imageId: favoritesArray[indexPath.row].imageId)
     }
 }
 
