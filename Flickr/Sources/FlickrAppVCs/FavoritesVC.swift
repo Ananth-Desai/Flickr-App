@@ -11,8 +11,8 @@ import UIKit
 
 class FavoritesVC: UIViewController {
     weak var favoritesDelegate: FavoritesViewControllerDelegate?
-    private weak var collectionView: UICollectionView?
-    private weak var textView: UILabel?
+    private weak var collectionView: UICollectionView!
+    private weak var textView: UILabel!
     private var isFavouritesEmpty: Bool?
     private var favoritesArray: [FavoriteImageData]?
 

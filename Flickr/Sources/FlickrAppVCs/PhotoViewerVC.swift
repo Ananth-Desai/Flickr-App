@@ -27,9 +27,9 @@ class PhotoViewerVC: UIViewController {
     private var favoriteState: Bool = false
     private var imageTitle: String
     private var imageId: String
-    private weak var stackView: UIStackView?
-    private weak var imageView: UIImageView?
-    private weak var favoriteButton: UIButton?
+    private weak var stackView: UIStackView!
+    private weak var imageView: UIImageView!
+    private weak var favoriteButton: UIButton!
     weak var photoViewerDelegate: PhotoViewerViewControllerDelegate?
     weak var favoritesDelegate: FavoritesViewControllerDelegate?
 
