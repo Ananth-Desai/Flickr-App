@@ -9,8 +9,6 @@ import Foundation
 import UIKit
 
 class TabsCoordinator {
-    // function that returns a UIViewController, needs to be pushed to nav using window!.setup
-
     func setupRootViewController() -> UIViewController {
         let tabsVC = TabsVC()
         return tabsVC

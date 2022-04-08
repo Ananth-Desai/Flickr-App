@@ -10,6 +10,7 @@ import UIKit
 
 class SearchTabCoordinator {
     weak var rootNavigationController: UINavigationController?
+    var favoritesArray: FavoriteImagesArray? = FavoriteImagesArray(array: [])
 
     private func returnSearchScreenVC() -> UIViewController {
         let searchScreenVC = SearchScreenVC()
@@ -55,10 +56,35 @@ extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
 }
 
 extension SearchTabCoordinator: SearchResultsViewControllerDelegate {
-    func didSelectImage(url: URL, title: String, imageTitle: String) {
-        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle)
+    func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String) {
+        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil)
         photoViewerVC.title = title
+        photoViewerVC.photoViewerDelegate = self
         rootNavigationController?.pushViewController(photoViewerVC, animated: true)
+    }
+}
+
+extension SearchTabCoordinator: PhotoViewerViewControllerDelegate {
+    func storeImageAsFavorite(imageData: Data, id: String, title: String) {
+        var favorites = FavoriteImagesArray(array: [])
+        let newArray = PersistenceManager.retrieveData() ?? []
+        favorites.array = newArray
+        let image = FavoriteImageData(imageId: id, imageData: imageData, imageTitle: title)
+        favorites.array.append(image)
+        favoritesArray = favorites
+        PersistenceManager.storeData(favoritesArray)
+    }
+
+    func removeImageFromFavorites(id: String) {
+        var newFavoriteArray = FavoriteImagesArray(array: [])
+        guard let favoriteArray = PersistenceManager.retrieveData() else {
+            return
+        }
+        for photo in favoriteArray where photo.imageId != id {
+            newFavoriteArray.array.append(photo)
+        }
+        favoritesArray = newFavoriteArray
+        PersistenceManager.storeData(favoritesArray)
     }
 }
 
