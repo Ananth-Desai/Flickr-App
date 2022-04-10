@@ -14,6 +14,7 @@ defaultText = "Search for a photo and mark it as your \n favorite. Photos marked
 // Search Screen Strings
 searchFieldPlaceholder = "Search Flickr...";
 searchButtonTitle = "Search";
+searchScreenDefaultText = "Find photos you like and save them by tapping heart icon.";
 
 // Error Alert Strings
 searchErrorTitle = "Error";
