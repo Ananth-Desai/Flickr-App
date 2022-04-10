@@ -32,7 +32,6 @@ class NewSearchScreenVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = viewBackgroundColor
-//        navigationItem.searchController?.searchBar.tintColor = navigationBarTintColor
         navigationController?.navigationBar.tintColor = navigationBarTintColor
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         let textviewConstraints = setupDefaultTextView()
