@@ -7,27 +7,32 @@
 
 import Foundation
 import RxCocoa
+import RxDataSources
 import RxSwift
 import UIKit
 
-protocol NewSearchScreenViewControllerDelegate: AnyObject {
+protocol SearchScreenViewControllerDelegate: AnyObject {
     func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String)
 }
 
-class NewSearchScreenVC: UIViewController {
+class SearchScreenVC: UIViewController {
     // MARK: Variables
 
     private weak var collectionView: UICollectionView!
     private weak var textView: UILabel!
     private weak var progressView: UIActivityIndicatorView!
     private var photos: [URL] = []
-    private var searchString = BehaviorRelay<String>(value: "")
+    private var photoSections: [PhotosSectionDS] = [PhotosSectionDS(photos: [])]
+    private var dataSource: RxCollectionViewSectionedAnimatedDataSource<PhotosSectionDS>?
     private var nextVCTitle: String?
+    private var imagesLoaded: Bool = false
+    private var clickedCancel: Bool = false
     private let disposeBag = DisposeBag()
     private let constants = GlobalConstants()
     private var imageTitles: [String] = []
     private var imageIDs: [String] = []
-    weak var searchResultsDelegate: NewSearchScreenViewControllerDelegate?
+    private weak var task: URLSessionDataTask?
+    weak var searchResultsDelegate: SearchScreenViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,8 +43,23 @@ class NewSearchScreenVC: UIViewController {
         let progressViewConstraints = setupProgressView()
         let collectionViewConstraints = setupCollectionView()
         NSLayoutConstraint.activate(textviewConstraints + progressViewConstraints + collectionViewConstraints)
-        setSearchBarTargets()
+        handleCancelButtonSubsciption()
         handleSearchStringSubscription()
+        setupRxDataSource()
+    }
+
+    private func setupRxDataSource() {
+        let dataSource = RxCollectionViewSectionedAnimatedDataSource<PhotosSectionDS>(
+            configureCell: { _, collectionView, indexPath, photosObject in
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath) as? CustomCollectionViewCell
+                if let cell = cell {
+                    cell.setupCollectionViewCell(photos: photosObject.photoUrl, indexPath: indexPath.row)
+                    return cell
+                }
+                return UICollectionViewCell()
+            }
+        )
+        self.dataSource = dataSource
     }
 
     private func setupDefaultTextView() -> [NSLayoutConstraint] {
@@ -77,7 +97,6 @@ class NewSearchScreenVC: UIViewController {
         let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: collectionViewFlowLayout)
         collectionView.configureView { collectionView in
             collectionView.delegate = self
-            collectionView.dataSource = self
             collectionView.isHidden = true
             collectionView.register(CustomCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
         }
@@ -105,49 +124,62 @@ class NewSearchScreenVC: UIViewController {
         ]
     }
 
-    private func setSearchBarTargets() {
-        if #available(iOS 13.0, *) {
-            navigationItem.searchController?.searchBar.searchTextField.addTarget(self, action: #selector(searchStringChanged), for: .editingDidEnd)
-        } else {
-            // Fallback on earlier versions
-            let searchTextField = navigationItem.searchController?.searchBar.value(forKey: searchBarKey) as? UITextField
-            searchTextField?.addTarget(self, action: #selector(searchStringChanged), for: .editingDidEnd)
-        }
-    }
-
     private func handleSearchStringSubscription() {
-        searchString
+        navigationItem.searchController?.searchBar.rx.text
             .asObservable()
+            .debounce(.milliseconds(1000), scheduler: MainScheduler.instance)
             .subscribe(onNext: { string in
-                if string.count > 2 {
-                    self.progressView.startAnimating()
-                    self.fetchPhotos(searchString: string)
-                    self.nextVCTitle = string
-                    self.textView.isHidden = true
-                } else {
-                    self.progressView.stopAnimating()
-                    self.textView.isHidden = false
-                    self.collectionView.isHidden = true
+                if let string = string {
+                    if string.count > 2 {
+                        self.collectionView.isHidden = true
+                        self.progressView.startAnimating()
+                        self.fetchPhotos(searchString: string)
+                        self.nextVCTitle = string
+                        self.textView.isHidden = true
+                        self.clickedCancel = false
+                    } else {
+                        if !self.imagesLoaded {
+                            self.progressView.stopAnimating()
+                            self.textView.isHidden = false
+                            self.collectionView.isHidden = true
+                        } else {
+                            if self.clickedCancel {
+                                self.progressView.stopAnimating()
+                                self.textView.isHidden = true
+                                self.collectionView.isHidden = false
+                            } else {
+                                self.progressView.stopAnimating()
+                                self.textView.isHidden = false
+                                self.collectionView.isHidden = true
+                            }
+                        }
+                    }
                 }
             })
             .disposed(by: disposeBag)
     }
 
-    @objc private func searchStringChanged() {
-        let newText = navigationItem.searchController?.searchBar.text
-        if let newText = newText {
-            searchString.accept(newText)
-        }
+    private func handleCancelButtonSubsciption() {
+        navigationItem.searchController?.searchBar.rx.cancelButtonClicked
+            .asObservable()
+            .subscribe(onNext: { _ in
+                self.clickedCancel = true
+                self.task?.cancel()
+                self.progressView.stopAnimating()
+            })
+            .disposed(by: disposeBag)
     }
 
     func fetchPhotos(searchString: String) {
         var photosArray: [URL] = []
         imageTitles = []
         imageIDs = []
+        imagesLoaded = false
+        photoSections[0].emptyPhotosArray()
         guard let url = returnSearchUrl(searchString: searchString) else {
             return
         }
-        let task = URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
+        task = URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
             guard let data = data, error == nil else {
                 return
             }
@@ -163,12 +195,17 @@ class NewSearchScreenVC: UIViewController {
             photosArray = self.constructIndividualUrls(result)
             self.photos = photosArray
             DispatchQueue.main.async { [self] in
+                if let dataSource = dataSource {
+                    Observable.just(photoSections)
+                        .bind(to: collectionView.rx.items(dataSource: dataSource))
+                        .disposed(by: disposeBag)
+                }
                 progressView.stopAnimating()
                 collectionView.isHidden = false
-                self.collectionView?.reloadData()
+                imagesLoaded = true
             }
         })
-        task.resume()
+        task?.resume()
     }
 
     private func returnSearchUrl(searchString: String) -> URL? {
@@ -181,11 +218,14 @@ class NewSearchScreenVC: UIViewController {
 
     private func constructIndividualUrls(_ result: Photos) -> [URL] {
         var individualPhotoUrls: [URL] = []
+        var count = 0
         for photo in result.photos.photo {
             guard let imageUrl = returnImageURl(image: photo) else {
                 return []
             }
             individualPhotoUrls.append(imageUrl)
+            photoSections[0].pushToPhotosArray(image: PhotoUrl(photoUrl: imageUrl, id: count))
+            count += 1
             imageTitles.append(photo.title)
             imageIDs.append(photo.id)
         }
@@ -195,20 +235,7 @@ class NewSearchScreenVC: UIViewController {
 
 // MARK: Extensions
 
-extension NewSearchScreenVC: UICollectionViewDataSource, UICollectionViewDelegate {
-    func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
-        photos.count
-    }
-
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath) as? CustomCollectionViewCell
-        cell?.setupCollectionViewCell(photos: photos, indexPath: indexPath.row)
-        guard let cell = cell else {
-            return UICollectionViewCell()
-        }
-        return cell
-    }
-
+extension SearchScreenVC: UICollectionViewDelegate {
     func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let nextVCTitle = nextVCTitle, photos.isEmpty == false else {
             return

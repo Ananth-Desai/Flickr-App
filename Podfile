@@ -7,6 +7,7 @@ target 'Flickr' do
   pod 'R.swift'
   pod 'Nuke', '~> 9.0'
   pod 'RxSwift'
+  pod 'RxDataSources'
   pod 'RxCocoa'
   target 'FlickrTests' do
     pod 'libPhoneNumber-iOS', '~> 0.8', :modular_headers => true

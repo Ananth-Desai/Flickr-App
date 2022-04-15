@@ -9,11 +9,12 @@ import Foundation
 import UIKit
 
 class TabsVC: UITabBarController {
-    private var searchCoordinator: NewSearchTabCoordinator?
+    private var searchCoordinator: SearchTabCoordinator?
     private var favoritesCoordinator: FavoritesCoordinator?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.hidesSearchBarWhenScrolling = true
         setupTabBarController()
     }
 
@@ -21,7 +22,7 @@ class TabsVC: UITabBarController {
         tabBar.backgroundColor = tabbarBackgroundColor
         tabBar.tintColor = tabbarTintColor
 
-        let searchCoordinator = NewSearchTabCoordinator()
+        let searchCoordinator = SearchTabCoordinator()
         self.searchCoordinator = searchCoordinator
         let searchVC = searchCoordinator.returnRootNavigator()
         searchVC.tabBarItem = UITabBarItem(title: homeVcTitle, image: searchIcon, tag: 0)

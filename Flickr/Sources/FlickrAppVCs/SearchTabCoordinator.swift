@@ -9,13 +9,13 @@ import Foundation
 import RxSwift
 import UIKit
 
-class NewSearchTabCoordinator {
+class SearchTabCoordinator {
     weak var rootNavigationController: UINavigationController?
     private var searchString: String?
     var favoritesArray: FavoriteImagesArray? = FavoriteImagesArray(array: [])
 
     private func returnSearchScreenVC() -> UIViewController {
-        let searchScreenVC = NewSearchScreenVC()
+        let searchScreenVC = SearchScreenVC()
         searchScreenVC.searchResultsDelegate = self
         let titleAttributes = [
             NSAttributedString.Key.font: UIFont(name: titleFontName, size: 23)!,
@@ -56,7 +56,7 @@ class NewSearchTabCoordinator {
 
 // MARK: Extensions
 
-extension NewSearchTabCoordinator: NewSearchScreenViewControllerDelegate {
+extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
     func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String) {
         let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil)
         photoViewerVC.title = title
@@ -65,7 +65,7 @@ extension NewSearchTabCoordinator: NewSearchScreenViewControllerDelegate {
     }
 }
 
-extension NewSearchTabCoordinator: PhotoViewerViewControllerDelegate {
+extension SearchTabCoordinator: PhotoViewerViewControllerDelegate {
     func storeImageAsFavorite(imageData: Data, id: String, title: String) {
         var favorites = FavoriteImagesArray(array: [])
         let newArray = PersistenceManager.retrieveData() ?? []
