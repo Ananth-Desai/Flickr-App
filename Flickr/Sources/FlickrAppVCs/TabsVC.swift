@@ -14,6 +14,7 @@ class TabsVC: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.hidesSearchBarWhenScrolling = true
         setupTabBarController()
     }
 

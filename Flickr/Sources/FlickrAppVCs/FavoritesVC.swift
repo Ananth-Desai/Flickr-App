@@ -81,14 +81,15 @@ class FavoritesVC: UIViewController {
 
     private func setupDefaultTextView() -> [NSLayoutConstraint] {
         let textView = UILabel()
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.text = favoritesDefaultText
-        textView.font = UIFont(name: favoritesDefaultTextFontName, size: favoritesDefaultTextFontSize)
-        textView.textColor = textFieldColor
-        textView.backgroundColor = viewBackgroundColor
-        textView.textAlignment = .center
-        textView.lineBreakMode = .byClipping
-        textView.numberOfLines = textNumberOfLines
+        textView.configureView { textView in
+            textView.text = favoritesDefaultText
+            textView.font = UIFont(name: favoritesDefaultTextFontName, size: favoritesDefaultTextFontSize)
+            textView.textColor = textFieldColor
+            textView.backgroundColor = viewBackgroundColor
+            textView.textAlignment = .center
+            textView.lineBreakMode = .byClipping
+            textView.numberOfLines = textNumberOfLines
+        }
         self.textView = textView
         view.addSubview(textView)
 

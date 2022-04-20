@@ -1,4 +1,5 @@
 PODS:
+  - Differentiator (5.0.0)
   - LeoUI (0.1.0):
     - libPhoneNumber-iOS (~> 0.8)
   - libPhoneNumber-iOS (0.9.15)
@@ -6,6 +7,15 @@ PODS:
   - R.swift (6.1.0):
     - R.swift.Library (~> 5.3.0)
   - R.swift.Library (5.3.0)
+  - RxCocoa (6.5.0):
+    - RxRelay (= 6.5.0)
+    - RxSwift (= 6.5.0)
+  - RxDataSources (5.0.0):
+    - Differentiator (~> 5.0)
+    - RxCocoa (~> 6.0)
+    - RxSwift (~> 6.0)
+  - RxRelay (6.5.0):
+    - RxSwift (= 6.5.0)
   - RxSwift (6.5.0)
   - Sedwig (0.1.0):
     - Sedwig/AsyncAPIClientCombine (= 0.1.0)
@@ -26,14 +36,21 @@ DEPENDENCIES:
   - libPhoneNumber-iOS (~> 0.8)
   - Nuke (~> 9.0)
   - R.swift
+  - RxCocoa
+  - RxDataSources
+  - RxSwift
   - Sedwig (from `https://github.com/surya-soft/Sedwig.git`)
 
 SPEC REPOS:
   trunk:
+    - Differentiator
     - libPhoneNumber-iOS
     - Nuke
     - R.swift
     - R.swift.Library
+    - RxCocoa
+    - RxDataSources
+    - RxRelay
     - RxSwift
 
 EXTERNAL SOURCES:
@@ -51,14 +68,18 @@ CHECKOUT OPTIONS:
     :git: https://github.com/surya-soft/Sedwig.git
 
 SPEC CHECKSUMS:
+  Differentiator: e8497ceab83c1b10ca233716d547b9af21b9344d
   LeoUI: 7d4b98e223cfd57e010333f2fac2b2468be2094d
   libPhoneNumber-iOS: 0a32a9525cf8744fe02c5206eb30d571e38f7d75
   Nuke: 6f400a4ea957e09149ec335a3c6acdcc814d89e4
   R.swift: ec98ff71c4ab2f6fd01dd077e5afd15e63a4834c
   R.swift.Library: 0fc583cb55a99e28901299cc451614cad1161962
+  RxCocoa: 94f817b71c07517321eb4f9ad299112ca8af743b
+  RxDataSources: aa47cc1ed6c500fa0dfecac5c979b723542d79cf
+  RxRelay: 1de1523e604c72b6c68feadedd1af3b1b4d0ecbd
   RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
   Sedwig: 6892a5ff356ee3cec32fc7b21824741d0e1fcdf8
 
-PODFILE CHECKSUM: 310fc5b038664a04ecf41bcd1c670146675647e7
+PODFILE CHECKSUM: a8b64d964dfb95b141d4b844acae8bcfc2a01dc5
 
 COCOAPODS: 1.11.2

@@ -5,6 +5,7 @@
 //  Created by Ananth Desai on 30/03/22.
 //
 
+import Differentiator
 import Foundation
 
 struct Photos: Codable {
@@ -45,4 +46,51 @@ struct FavoriteImagesArray: Codable {
     init(array: [FavoriteImageData]) {
         self.array = array
     }
+}
+
+struct PhotoUrl {
+    var photoUrl: URL
+    var id: Int
+}
+
+extension PhotoUrl: IdentifiableType {
+    var identity: Int {
+        id
+    }
+
+    typealias Identity = Int
+}
+
+extension PhotoUrl: Equatable {}
+
+struct PhotosSectionDS {
+    var photos: [Item]
+    var uniqueIdentity: Int = 0
+
+    mutating func pushToPhotosArray(image: PhotoUrl) {
+        photos.append(image)
+    }
+
+    mutating func emptyPhotosArray() {
+        photos = []
+    }
+}
+
+extension PhotosSectionDS: AnimatableSectionModelType, Equatable, IdentifiableType {
+    var items: [PhotoUrl] {
+        photos
+    }
+
+    init(original: PhotosSectionDS, items: [PhotoUrl]) {
+        self = original
+        photos = items
+    }
+
+    var identity: Int {
+        uniqueIdentity
+    }
+
+    typealias Identity = Int
+
+    typealias Item = PhotoUrl
 }

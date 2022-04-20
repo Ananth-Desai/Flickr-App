@@ -1,159 +1,266 @@
 //
-//  HomeScreenVC.swift
-//  Flickr-App
+//  NewSearchScreenVC.swift
+//  Flickr
 //
-//  Created by Ananth Desai on 02/03/22.
+//  Created by Ananth Desai on 10/04/22.
 //
 
 import Foundation
-import LeoUI
+import RxCocoa
+import RxDataSources
+import RxSwift
 import UIKit
 
 protocol SearchScreenViewControllerDelegate: AnyObject {
-    func didTapSearchButton(searchString: String)
+    func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String)
 }
 
 class SearchScreenVC: UIViewController {
-    private weak var progressButton: ProgressButton!
-    private weak var searchButton: UIButton!
-    private weak var searchBar: UISearchBar!
-    weak var searchScreenDelegate: SearchScreenViewControllerDelegate?
+    // MARK: Variables
+
+    private weak var collectionView: UICollectionView!
+    private weak var textView: UILabel!
+    private weak var progressView: UIActivityIndicatorView!
+    private var photos: [URL] = []
+    private var photoSections: [PhotosSectionDS] = [PhotosSectionDS(photos: [])]
+    private var dataSource: RxCollectionViewSectionedAnimatedDataSource<PhotosSectionDS>?
+    private var nextVCTitle: String?
+    private var imagesLoaded: Bool = false
+    private var clickedCancel: Bool = false
+    private let disposeBag = DisposeBag()
+    private let constants = GlobalConstants()
+    private var imageTitles: [String] = []
+    private var imageIDs: [String] = []
+    private weak var task: URLSessionDataTask?
+    weak var searchResultsDelegate: SearchScreenViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = viewBackgroundColor
+        navigationController?.navigationBar.tintColor = navigationBarTintColor
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        setupViews()
+        let textviewConstraints = setupDefaultTextView()
+        let progressViewConstraints = setupProgressView()
+        let collectionViewConstraints = setupCollectionView()
+        NSLayoutConstraint.activate(textviewConstraints + progressViewConstraints + collectionViewConstraints)
+        handleCancelButtonSubsciption()
+        handleSearchStringSubscription()
+        setupRxDataSource()
     }
 
-    private func setupViews() {
-        let textFieldConstraints = setupTextField()
-        NSLayoutConstraint.activate(textFieldConstraints)
-        let searchButtonConstraints = setupSearchButton()
-        NSLayoutConstraint.activate(searchButtonConstraints)
-
-        let progressButtonConstraints = setupProgressButton()
-        NSLayoutConstraint.activate(progressButtonConstraints)
+    private func setupRxDataSource() {
+        let dataSource = RxCollectionViewSectionedAnimatedDataSource<PhotosSectionDS>(
+            configureCell: { _, collectionView, indexPath, photosObject in
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath) as? CustomCollectionViewCell
+                if let cell = cell {
+                    cell.setupCollectionViewCell(photos: photosObject.photoUrl, indexPath: indexPath.row)
+                    return cell
+                }
+                return UICollectionViewCell()
+            }
+        )
+        self.dataSource = dataSource
     }
 
-    private func setupTextField() -> [NSLayoutConstraint] {
-        let searchBar = UISearchBar()
-        if #available(iOS 13.0, *) {
-            searchBar.searchTextField.addTarget(self, action: #selector(setButtonBackground), for: .editingChanged)
-            searchBar.searchTextField.borderStyle = .roundedRect
-        } else {
-            // Fallback on earlier versions
-            let searchTextField = searchBar.value(forKey: searchBarKey) as? UITextField
-            searchTextField?.addTarget(self, action: #selector(setButtonBackground), for: .editingChanged)
-            searchTextField?.borderStyle = .roundedRect
+    private func setupDefaultTextView() -> [NSLayoutConstraint] {
+        let textView = UILabel()
+        textView.configureView { textView in
+            textView.text = searchDefaultText
+            textView.textAlignment = .center
+            textView.lineBreakMode = .byClipping
+            textView.numberOfLines = textNumberOfLines
+            textView.textColor = defaultTextFontColor
+            textView.font = UIFont(name: defaultTextFontName, size: defaultTextFontSize)
         }
-        searchBar.searchBarStyle = .minimal
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.placeholder = searchFieldPlaceholder
-        searchBar.tintColor = textFieldTintColor
-        searchBar.keyboardType = .default
-        self.searchBar = searchBar
-        view.addSubview(searchBar)
+        self.textView = textView
+        view.addSubview(textView)
+
         return [
-            searchBar.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            searchBar.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: searchBarCenterYAnchorConstant),
-            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: searchBarLeadingAnchorConstant),
-            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: searchBarTrailingAnchorConstant)
+            textView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            textView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: defaultTextViewCenterYAnchorConstant),
+            textView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: defaultTextViewLeadingAnchorConstant),
+            textView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: defaultTextViewTrailingAnchorConstant)
         ]
     }
 
-    private func setupSearchButton() -> [NSLayoutConstraint] {
-        let searchButton = UIButton()
-        searchButton.translatesAutoresizingMaskIntoConstraints = false
-        searchButton.layer.cornerRadius = buttonRadius
-        searchButton.setTitle(searchButtonTitle, for: .normal)
-        searchButton.backgroundColor = disabledButtonColor
-        searchButton.setTitleColor(.white, for: .normal)
-        searchButton.contentEdgeInsets = buttonEdgeInsets
-        searchButton.addTarget(self, action: #selector(clickedSearch), for: .touchUpInside)
-        self.searchButton = searchButton
-        view.addSubview(searchButton)
-
-        return [
-            searchButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            searchButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: searchButtonCenterYAnchotConstant)
-        ]
+    private func returnCollectionViewFlowLayout() -> UICollectionViewFlowLayout {
+        let collectionViewLayout = UICollectionViewFlowLayout()
+        collectionViewLayout.minimumInteritemSpacing = minimumInteritemSpacing
+        collectionViewLayout.minimumLineSpacing = minimumLineSpacing
+        collectionViewLayout.sectionInset = sectionInset
+        collectionViewLayout.itemSize = CGSize(width: (view.frame.width - 6) / 3, height: cellHeight)
+        return collectionViewLayout
     }
 
-    private func setupProgressButton() -> [NSLayoutConstraint] {
-        let progressButton = ProgressButton()
-        progressButton.translatesAutoresizingMaskIntoConstraints = false
-        progressButton.layer.cornerRadius = buttonRadius
-        progressButton.isHidden = true
-        progressButton.backgroundColor = enabledButtonColor
-        progressButton.setTitleColor(.white, for: .normal)
-        progressButton.showProgress()
-        self.progressButton = progressButton
-        view.addSubview(progressButton)
-        guard let searchBar = searchBar else {
-            return [
-                progressButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                progressButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: progressButtonCenterYAnchorConstant),
-                progressButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: progressButtonLeadingAnchorConstant),
-                progressButton.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: progressButtonTrailingAnchorConstant)
-            ]
+    private func setupCollectionView() -> [NSLayoutConstraint] {
+        let collectionViewFlowLayout = returnCollectionViewFlowLayout()
+        let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: collectionViewFlowLayout)
+        collectionView.configureView { collectionView in
+            collectionView.delegate = self
+            collectionView.isHidden = true
+            collectionView.register(CustomCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
         }
-
+        self.collectionView = collectionView
+        view.addSubview(collectionView)
         return [
-            progressButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            progressButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: progressButtonCenterYAnchorConstant),
-            progressButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: progressButtonLeadingAnchorConstant),
-            progressButton.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: progressButtonTrailingAnchorConstant),
-            progressButton.topAnchor.constraint(equalTo: searchBar.bottomAnchor)
+            collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ]
     }
 
-    @objc private func setButtonBackground() {
-        guard let searchBar = searchBar else {
+    func setupProgressView() -> [NSLayoutConstraint] {
+        let progressView = UIActivityIndicatorView()
+        progressView.configureView { progressView in
+            progressView.stopAnimating()
+            progressView.hidesWhenStopped = true
+        }
+        view.addSubview(progressView)
+        self.progressView = progressView
+        return [
+            progressView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            progressView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: progressViewCenterYAnchorConstant)
+        ]
+    }
+
+    private func handleSearchStringSubscription() {
+        navigationItem.searchController?.searchBar.rx.text
+            .asObservable()
+            .debounce(.milliseconds(1000), scheduler: MainScheduler.instance)
+            .subscribe(onNext: { string in
+                if let string = string {
+                    if string.count > 2 {
+                        self.collectionView.isHidden = true
+                        self.progressView.startAnimating()
+                        self.fetchPhotos(searchString: string)
+                        self.nextVCTitle = string
+                        self.textView.isHidden = true
+                        self.clickedCancel = false
+                    } else {
+                        if !self.imagesLoaded {
+                            self.progressView.stopAnimating()
+                            self.textView.isHidden = false
+                            self.collectionView.isHidden = true
+                        } else {
+                            if self.clickedCancel {
+                                self.progressView.stopAnimating()
+                                self.textView.isHidden = true
+                                self.collectionView.isHidden = false
+                            } else {
+                                self.progressView.stopAnimating()
+                                self.textView.isHidden = false
+                                self.collectionView.isHidden = true
+                            }
+                        }
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+
+    private func handleCancelButtonSubsciption() {
+        navigationItem.searchController?.searchBar.rx.cancelButtonClicked
+            .asObservable()
+            .subscribe(onNext: { _ in
+                self.clickedCancel = true
+                self.task?.cancel()
+                self.progressView.stopAnimating()
+            })
+            .disposed(by: disposeBag)
+    }
+
+    func fetchPhotos(searchString: String) {
+        var photosArray: [URL] = []
+        imageTitles = []
+        imageIDs = []
+        imagesLoaded = false
+        photoSections[0].emptyPhotosArray()
+        guard let url = returnSearchUrl(searchString: searchString) else {
             return
         }
-        searchButton?.isEnabled = (searchBar.text?.count ?? 0) > 0 ? true : false
-        searchButton?.backgroundColor = (searchBar.text?.count ?? 0) > 0 ? enabledButtonColor : disabledButtonColor
-    }
-
-    @objc private func clickedSearch() {
-        let errorCoordinator = Flickr.ErrorCoordinator()
-        guard let alertVC = errorCoordinator.handleSearchStringErrors(searchString: searchBar?.text) else {
-            guard let searchBar = searchBar else {
+        task = URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
+            guard let data = data, error == nil else {
                 return
             }
-            searchButton?.isHidden = true
-            progressButton?.isHidden = false
-            _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                self.progressButton?.isHidden = true
-                self.searchButton?.isHidden = false
-                timer.invalidate()
+            var result: Photos?
+            do {
+                result = try JSONDecoder().decode(Photos.self, from: data)
+            } catch {
+                return
             }
-            searchScreenDelegate?.didTapSearchButton(searchString: searchBar.text ?? "")
+            guard let result = result else {
+                return
+            }
+            photosArray = self.constructIndividualUrls(result)
+            self.photos = photosArray
+            DispatchQueue.main.async { [self] in
+                if let dataSource = dataSource {
+                    Observable.just(photoSections)
+                        .bind(to: collectionView.rx.items(dataSource: dataSource))
+                        .disposed(by: disposeBag)
+                }
+                progressView.stopAnimating()
+                collectionView.isHidden = false
+                imagesLoaded = true
+            }
+        })
+        task?.resume()
+    }
+
+    private func returnSearchUrl(searchString: String) -> URL? {
+        constants.returnSearchUrl(searchString: searchString)
+    }
+
+    private func returnImageURl(image: SinglePhoto) -> URL? {
+        constants.returnImageUrl(image: image)
+    }
+
+    private func constructIndividualUrls(_ result: Photos) -> [URL] {
+        var individualPhotoUrls: [URL] = []
+        var count = 0
+        for photo in result.photos.photo {
+            guard let imageUrl = returnImageURl(image: photo) else {
+                return []
+            }
+            individualPhotoUrls.append(imageUrl)
+            photoSections[0].pushToPhotosArray(image: PhotoUrl(photoUrl: imageUrl, id: count))
+            count += 1
+            imageTitles.append(photo.title)
+            imageIDs.append(photo.id)
+        }
+        return individualPhotoUrls
+    }
+}
+
+// MARK: Extensions
+
+extension SearchScreenVC: UICollectionViewDelegate {
+    func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let nextVCTitle = nextVCTitle, photos.isEmpty == false else {
             return
         }
-        present(alertVC, animated: true, completion: nil)
+        searchResultsDelegate?.didSelectImage(url: photos[indexPath.row], title: nextVCTitle, imageTitle: imageTitles[indexPath.row], imageId: imageIDs[indexPath.row])
     }
 }
 
 // MARK: Constants
 
-private let viewBackgroundColor = R.color.viewBackground()
-private let textFieldBackground = R.color.searchBarBackground()
-private let buttonRadius: CGFloat = 10
-private let enabledButtonColor = R.color.searchButtonEnabled()
-private let disabledButtonColor = R.color.searchButtonDisabled()
-private let textFieldTintColor = R.color.searchBarIconColor()
-private let buttonEdgeInsets = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 20)
-private let searchBarCenterYAnchorConstant: CGFloat = -150
-private let searchBarLeadingAnchorConstant: CGFloat = 30
-private let searchBarTrailingAnchorConstant: CGFloat = -30
-private let searchButtonCenterYAnchotConstant: CGFloat = -100
-private let progressButtonCenterYAnchorConstant: CGFloat = -100
-private let progressButtonLeadingAnchorConstant: CGFloat = -50
-private let progressButtonTrailingAnchorConstant: CGFloat = 50
-private let navigationBarTitleColor = R.color.navigationBarTintColor()
-private let navigationBarBackgroundColor = R.color.navigationBarBackground()
-private let searchFieldPlaceholder = R.string.localizable.searchFieldPlaceholder()
-private let searchButtonTitle = R.string.localizable.searchButtonTitle()
 private let searchBarKey = "searchField"
+private let viewBackgroundColor = R.color.viewBackground()
+private let searchFieldPlaceholder = R.string.localizable.searchFieldPlaceholder()
+private let searchDefaultText = R.string.localizable.searchScreenDefaultText()
+private let textNumberOfLines = 3
+private let defaultTextFontColor = R.color.favoritesDefaultText()
+private let defaultTextFontName = "Arial"
+private let defaultTextFontSize: CGFloat = 14
+private let cellHeight: CGFloat = 120
+private let cellReuseIdentifier = "customCell"
+private let minimumInteritemSpacing: CGFloat = 3
+private let minimumLineSpacing: CGFloat = 3
+private let sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+private let progressViewCenterYAnchorConstant: CGFloat = -50
+private let navigationBarTintColor = R.color.navigationBarTintColor()
+private let defaultTextViewCenterYAnchorConstant: CGFloat = -100
+private let defaultTextViewLeadingAnchorConstant: CGFloat = 50
+private let defaultTextViewTrailingAnchorConstant: CGFloat = -50

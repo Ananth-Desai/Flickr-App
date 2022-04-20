@@ -1,29 +1,39 @@
 //
-//  SearchTabCoordinator.swift
+//  NewSearchTabCoordinator.swift
 //  Flickr
 //
-//  Created by Ananth Desai on 20/03/22.
+//  Created by Ananth Desai on 10/04/22.
 //
 
 import Foundation
+import RxSwift
 import UIKit
 
 class SearchTabCoordinator {
     weak var rootNavigationController: UINavigationController?
+    private var searchString: String?
     var favoritesArray: FavoriteImagesArray? = FavoriteImagesArray(array: [])
 
     private func returnSearchScreenVC() -> UIViewController {
         let searchScreenVC = SearchScreenVC()
-        searchScreenVC.searchScreenDelegate = self
+        searchScreenVC.searchResultsDelegate = self
         let titleAttributes = [
             NSAttributedString.Key.font: UIFont(name: titleFontName, size: 23)!,
             NSAttributedString.Key.foregroundColor: navigationBarTitleColor
         ]
-        let title = NSAttributedString(string: title, attributes: titleAttributes)
+        let title = NSAttributedString(string: title, attributes: titleAttributes as [NSAttributedString.Key: Any])
         let navLabel = UILabel()
         navLabel.attributedText = title
         searchScreenVC.navigationItem.titleView = navLabel
+        searchScreenVC.navigationItem.searchController = returnSearchController()
         return searchScreenVC
+    }
+
+    private func returnSearchController() -> UISearchController {
+        let searchController = UISearchController()
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.keyboardType = .webSearch
+        return searchController
     }
 
     func returnRootNavigator() -> UINavigationController {
@@ -47,15 +57,6 @@ class SearchTabCoordinator {
 // MARK: Extensions
 
 extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
-    func didTapSearchButton(searchString: String) {
-        let searchResultsVC = SearchResultsVC(searchString: searchString)
-        searchResultsVC.searchResultsDelegate = self
-        searchResultsVC.title = searchString
-        rootNavigationController?.pushViewController(searchResultsVC, animated: true)
-    }
-}
-
-extension SearchTabCoordinator: SearchResultsViewControllerDelegate {
     func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String) {
         let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil)
         photoViewerVC.title = title

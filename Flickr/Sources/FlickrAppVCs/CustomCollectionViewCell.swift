@@ -11,21 +11,22 @@ import UIKit
 
 class CustomCollectionViewCell: UICollectionViewCell {
     var indexPath: Int?
-    var photos: [URL]?
+    var photos: URL?
 
-    func setupCollectionViewCell(photos: [URL], indexPath: Int) {
+    override func prepareForReuse() {
+        for views in subviews {
+            views.removeFromSuperview()
+        }
+    }
+
+    func setupCollectionViewCell(photos: URL, indexPath: Int) {
         self.photos = photos
         self.indexPath = indexPath
-        if photos.isEmpty {
-            let spinnerConstraints = returnSpinner()
-            NSLayoutConstraint.activate(spinnerConstraints)
-        } else {
-            let imageView = returnImageView()
-            Nuke.loadImage(with: photos[indexPath], into: imageView)
-            addSubview(imageView)
-            let imageViewConstraints = returnImageViewConstraints(imageView: imageView)
-            NSLayoutConstraint.activate(imageViewConstraints)
-        }
+        let imageView = returnImageView()
+        Nuke.loadImage(with: photos, into: imageView)
+        addSubview(imageView)
+        let imageViewConstraints = returnImageViewConstraints(imageView: imageView)
+        NSLayoutConstraint.activate(imageViewConstraints)
     }
 
     private func returnImageView() -> UIImageView {

@@ -14,6 +14,7 @@ defaultText = "Recherchez une photo et marquez-lz \n comme votre favorite. Les p
 // Search Screen Strings
 searchFieldPlaceholder = "Rechercher Flickr...";
 searchButtonTitle = "Rechercher";
+searchScreenDefaultText = "Trouvez des photos que vous aimez et enregistrez-les en appuyant sur l'icône en forme de cœur.";
 
 // Error Alert Strings
 searchErrorTitle = "Erreur";
