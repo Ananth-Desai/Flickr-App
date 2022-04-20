@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GRDB
 import UIKit
 
 class GlobalCoordinator {
@@ -13,14 +14,16 @@ class GlobalCoordinator {
 
     private let window: UIWindow?
     private var rootNav: UINavigationController?
+    private var dbPool: DatabasePool
 
     init(window: UIWindow?) {
         self.window = window
+        dbPool = PersistenceManager.createDB()!
     }
 
     func setupRootViewController() {
         // new TabC object and call setup using obj, will be set to window!.setup here
-        let tabsCoordinator = TabsCoordinator()
+        let tabsCoordinator = TabsCoordinator(dbPool: dbPool)
         window?.setupRootViewController(with: tabsCoordinator.setupRootViewController())
     }
 }

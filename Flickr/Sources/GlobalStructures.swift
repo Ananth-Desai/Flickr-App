@@ -7,6 +7,7 @@
 
 import Differentiator
 import Foundation
+import GRDB
 
 struct Photos: Codable {
     var photos: PhotoArray
@@ -93,4 +94,16 @@ extension PhotosSectionDS: AnimatableSectionModelType, Equatable, IdentifiableTy
     typealias Identity = Int
 
     typealias Item = PhotoUrl
+}
+
+struct Favorites: Codable, FetchableRecord, PersistableRecord, TableRecord {
+    var id: String
+    var name: String
+    var image: Data
+
+    init(id: String, name: String, image: Data) {
+        self.id = id
+        self.name = name
+        self.image = image
+    }
 }

@@ -13,13 +13,14 @@ class CustomCollectionViewCell: UICollectionViewCell {
     var indexPath: Int?
     var photos: URL?
 
-    override func prepareForReuse() {
+    private func removeSubviews() {
         for views in subviews {
             views.removeFromSuperview()
         }
     }
 
     func setupCollectionViewCell(photos: URL, indexPath: Int) {
+        removeSubviews()
         self.photos = photos
         self.indexPath = indexPath
         let imageView = returnImageView()

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GRDB
 import RxSwift
 import UIKit
 
@@ -13,6 +14,11 @@ class SearchTabCoordinator {
     weak var rootNavigationController: UINavigationController?
     private var searchString: String?
     var favoritesArray: FavoriteImagesArray? = FavoriteImagesArray(array: [])
+    var dbPool: DatabasePool
+
+    init(dbPool: DatabasePool) {
+        self.dbPool = dbPool
+    }
 
     private func returnSearchScreenVC() -> UIViewController {
         let searchScreenVC = SearchScreenVC()
@@ -58,7 +64,7 @@ class SearchTabCoordinator {
 
 extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
     func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String) {
-        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil)
+        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil, dbPool: dbPool)
         photoViewerVC.title = title
         photoViewerVC.photoViewerDelegate = self
         rootNavigationController?.pushViewController(photoViewerVC, animated: true)
@@ -67,25 +73,23 @@ extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
 
 extension SearchTabCoordinator: PhotoViewerViewControllerDelegate {
     func storeImageAsFavorite(imageData: Data, id: String, title: String) {
-        var favorites = FavoriteImagesArray(array: [])
-        let newArray = PersistenceManager.retrieveData() ?? []
-        favorites.array = newArray
-        let image = FavoriteImageData(imageId: id, imageData: imageData, imageTitle: title)
-        favorites.array.append(image)
-        favoritesArray = favorites
-        PersistenceManager.storeData(favoritesArray)
+        do {
+            try dbPool.write { db in
+                try db.execute(sql: "INSERT INTO favorites (id, name, image) VALUES (?, ?, ?)", arguments: [id, title, imageData])
+            }
+        } catch {
+            return
+        }
     }
 
     func removeImageFromFavorites(id: String) {
-        var newFavoriteArray = FavoriteImagesArray(array: [])
-        guard let favoriteArray = PersistenceManager.retrieveData() else {
+        do {
+            try dbPool.write { db in
+                try db.execute(sql: "DELETE FROM favorites WHERE id = ? ", arguments: [id])
+            }
+        } catch {
             return
         }
-        for photo in favoriteArray where photo.imageId != id {
-            newFavoriteArray.array.append(photo)
-        }
-        favoritesArray = newFavoriteArray
-        PersistenceManager.storeData(favoritesArray)
     }
 }
 

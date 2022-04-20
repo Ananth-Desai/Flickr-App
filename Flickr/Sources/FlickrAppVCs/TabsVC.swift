@@ -6,11 +6,23 @@
 //
 
 import Foundation
+import GRDB
 import UIKit
 
 class TabsVC: UITabBarController {
     private var searchCoordinator: SearchTabCoordinator?
     private var favoritesCoordinator: FavoritesCoordinator?
+    var dbPool: DatabasePool
+
+    init(dbPool: DatabasePool) {
+        self.dbPool = dbPool
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,12 +34,12 @@ class TabsVC: UITabBarController {
         tabBar.backgroundColor = tabbarBackgroundColor
         tabBar.tintColor = tabbarTintColor
 
-        let searchCoordinator = SearchTabCoordinator()
+        let searchCoordinator = SearchTabCoordinator(dbPool: dbPool)
         self.searchCoordinator = searchCoordinator
         let searchVC = searchCoordinator.returnRootNavigator()
         searchVC.tabBarItem = UITabBarItem(title: homeVcTitle, image: searchIcon, tag: 0)
 
-        let favoritesCoordinator = FavoritesCoordinator()
+        let favoritesCoordinator = FavoritesCoordinator(dbPool: dbPool)
         self.favoritesCoordinator = favoritesCoordinator
         let favoritesVC = favoritesCoordinator.returnRootNavigator()
         favoritesVC.tabBarItem = UITabBarItem(title: favoritesVcTitle, image: favoritesIcon, tag: 0)

@@ -6,46 +6,43 @@
 //
 
 import Foundation
+import GRDB
 
 class PersistenceManager {
-    static func storeData(_ favoritesData: FavoriteImagesArray?) {
-        let searchDirectory = FileManager.SearchPathDirectory.documentDirectory
-        guard let url = FileManager.default.urls(for: searchDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName, isDirectory: false) else {
-            return
-        }
+    static func retrieveData(dbPool: DatabasePool) -> [FavoriteImageData]? {
+        var favoriteimagesArray: [FavoriteImageData] = []
         do {
-            let data = try JSONEncoder().encode(favoritesData)
-            if FileManager.default.fileExists(atPath: url.path) {
-                try FileManager.default.removeItem(at: url)
+            try dbPool.read { db in
+                let array = try Row.fetchCursor(db, sql: "SELECT * FROM favorites")
+                while let item = try array.next() {
+                    favoriteimagesArray.append(FavoriteImageData(imageId: item["id"], imageData: item["image"], imageTitle: item["name"]))
+                }
             }
-            FileManager.default.createFile(atPath: url.path, contents: data, attributes: nil)
+            return favoriteimagesArray
         } catch {
-            return
+            return nil
         }
     }
 
-    static func retrieveData() -> [FavoriteImageData]? {
-        let searchDirectory = FileManager.SearchPathDirectory.documentDirectory
-        guard let url = FileManager.default.urls(for: searchDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName, isDirectory: false) else {
-            return nil
-        }
+    static func createDB() -> DatabasePool? {
+        var mainFolderUrl: URL
+        var dbPath: URL
+        var dbPool: DatabasePool
+        do {
+            mainFolderUrl = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            dbPath = mainFolderUrl.appendingPathComponent("\(databaseName).db", isDirectory: false)
+            dbPool = try DatabasePool(path: dbPath.absoluteString, configuration: GRDB.Configuration())
+            var migrator = DatabaseMigrator()
+            try Migrations.migrate(migrator: &migrator, dbPool: dbPool)
 
-        if !FileManager.default.fileExists(atPath: url.path) {
+            return dbPool
+        } catch {
             return nil
         }
-        if let data = FileManager.default.contents(atPath: url.path) {
-            var decodedData: FavoriteImagesArray?
-            do {
-                decodedData = try JSONDecoder().decode(FavoriteImagesArray.self, from: data)
-                return decodedData?.array
-            } catch {
-                return nil
-            }
-        }
-        return nil
     }
 }
 
 // MARK: Constants
 
 private let fileName = "favorites.json"
+private let databaseName = "favorites"

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GRDB
 import Nuke
 import UIKit
 
@@ -32,8 +33,9 @@ class PhotoViewerVC: UIViewController {
     private weak var favoriteButton: UIButton!
     weak var photoViewerDelegate: PhotoViewerViewControllerDelegate?
     weak var favoritesDelegate: FavoritesViewControllerDelegate?
+    var dbPool: DatabasePool
 
-    init(url: URL?, imageTitle: String, imageId: String, imageData: Data?) {
+    init(url: URL?, imageTitle: String, imageId: String, imageData: Data?, dbPool: DatabasePool) {
         if url != nil {
             self.url = url
         } else {
@@ -41,8 +43,9 @@ class PhotoViewerVC: UIViewController {
         }
         self.imageTitle = imageTitle
         self.imageId = imageId
+        self.dbPool = dbPool
         super.init(nibName: nil, bundle: nil)
-        let favoritesArray = PersistenceManager.retrieveData()
+        let favoritesArray = PersistenceManager.retrieveData(dbPool: dbPool)
         guard let favoritesArray = favoritesArray else {
             return
         }

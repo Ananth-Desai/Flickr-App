@@ -1,5 +1,8 @@
 PODS:
   - Differentiator (5.0.0)
+  - GRDB.swift (5.23.0):
+    - GRDB.swift/standard (= 5.23.0)
+  - GRDB.swift/standard (5.23.0)
   - LeoUI (0.1.0):
     - libPhoneNumber-iOS (~> 0.8)
   - libPhoneNumber-iOS (0.9.15)
@@ -32,6 +35,7 @@ PODS:
     - Sedwig/CoreAPIClient
 
 DEPENDENCIES:
+  - GRDB.swift
   - LeoUI (from `https://github.com/surya-soft/Leo-iOS-UI.git`)
   - libPhoneNumber-iOS (~> 0.8)
   - Nuke (~> 9.0)
@@ -44,6 +48,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - Differentiator
+    - GRDB.swift
     - libPhoneNumber-iOS
     - Nuke
     - R.swift
@@ -69,6 +74,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Differentiator: e8497ceab83c1b10ca233716d547b9af21b9344d
+  GRDB.swift: e4a950fe99d113ea5d24571d49eaae0062303c14
   LeoUI: 7d4b98e223cfd57e010333f2fac2b2468be2094d
   libPhoneNumber-iOS: 0a32a9525cf8744fe02c5206eb30d571e38f7d75
   Nuke: 6f400a4ea957e09149ec335a3c6acdcc814d89e4
@@ -80,6 +86,6 @@ SPEC CHECKSUMS:
   RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
   Sedwig: 6892a5ff356ee3cec32fc7b21824741d0e1fcdf8
 
-PODFILE CHECKSUM: a8b64d964dfb95b141d4b844acae8bcfc2a01dc5
+PODFILE CHECKSUM: 3e7ed896cbec22570a4a9ac5d95df7e52dacc84c
 
 COCOAPODS: 1.11.2

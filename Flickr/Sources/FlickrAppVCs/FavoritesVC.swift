@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GRDB
 import Nuke
 import UIKit
 
@@ -15,6 +16,17 @@ class FavoritesVC: UIViewController {
     private weak var textView: UILabel!
     private var isFavouritesEmpty: Bool?
     private var favoritesArray: [FavoriteImageData]?
+    var dbPool: DatabasePool
+
+    init(dbPool: DatabasePool) {
+        self.dbPool = dbPool
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
