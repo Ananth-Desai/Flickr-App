@@ -14,10 +14,10 @@ class SearchTabCoordinator {
     weak var rootNavigationController: UINavigationController?
     private var searchString: String?
     var favoritesArray: FavoriteImagesArray? = FavoriteImagesArray(array: [])
-    var dbPool: DatabasePool
+    var persistenceManager: PersistenceManager?
 
-    init(dbPool: DatabasePool) {
-        self.dbPool = dbPool
+    init(persistenceManager: PersistenceManager?) {
+        self.persistenceManager = persistenceManager
     }
 
     private func returnSearchScreenVC() -> UIViewController {
@@ -64,7 +64,7 @@ class SearchTabCoordinator {
 
 extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
     func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String) {
-        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil, dbPool: dbPool)
+        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil, favoritesArray: persistenceManager?.retrieveData())
         photoViewerVC.title = title
         photoViewerVC.photoViewerDelegate = self
         rootNavigationController?.pushViewController(photoViewerVC, animated: true)
@@ -72,24 +72,16 @@ extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
 }
 
 extension SearchTabCoordinator: PhotoViewerViewControllerDelegate {
+    func getFavoriteImagesFromStorage() -> [FavoriteImageData]? {
+        persistenceManager?.retrieveData()
+    }
+
     func storeImageAsFavorite(imageData: Data, id: String, title: String) {
-        do {
-            try dbPool.write { db in
-                try db.execute(sql: "INSERT INTO favorites (id, name, image) VALUES (?, ?, ?)", arguments: [id, title, imageData])
-            }
-        } catch {
-            return
-        }
+        persistenceManager?.storeImageIntoDatabase(imageData: imageData, id: id, title: title)
     }
 
     func removeImageFromFavorites(id: String) {
-        do {
-            try dbPool.write { db in
-                try db.execute(sql: "DELETE FROM favorites WHERE id = ? ", arguments: [id])
-            }
-        } catch {
-            return
-        }
+        persistenceManager?.removeImageFromFavorites(id: id)
     }
 }
 

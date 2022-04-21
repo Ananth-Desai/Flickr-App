@@ -171,7 +171,7 @@ class SearchScreenVC: UIViewController {
     }
 
     func fetchPhotos(searchString: String) {
-        if task != nil {
+        if task?.state == .running {
             task?.cancel()
         }
         var photosArray: [URL] = []
@@ -206,7 +206,6 @@ class SearchScreenVC: UIViewController {
                 progressView.stopAnimating()
                 collectionView.isHidden = false
                 imagesLoaded = true
-                task = nil
             }
         })
         task?.resume()

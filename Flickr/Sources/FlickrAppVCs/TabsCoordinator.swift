@@ -10,14 +10,14 @@ import GRDB
 import UIKit
 
 class TabsCoordinator {
-    var dbPool: DatabasePool
+    var persistenceManager: PersistenceManager?
 
-    init(dbPool: DatabasePool) {
-        self.dbPool = dbPool
+    init(persistenceManager: PersistenceManager?) {
+        self.persistenceManager = persistenceManager
     }
 
     func setupRootViewController() -> UIViewController {
-        let tabsVC = TabsVC(dbPool: dbPool)
+        let tabsVC = TabsVC(persistenceManager: persistenceManager)
         return tabsVC
     }
 }

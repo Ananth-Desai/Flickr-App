@@ -11,14 +11,14 @@ import UIKit
 
 class FavoritesCoordinator {
     weak var rootNavigationController: UINavigationController!
-    var dbPool: DatabasePool
+    var persistenceManager: PersistenceManager?
 
-    init(dbPool: DatabasePool) {
-        self.dbPool = dbPool
+    init(persistenceManager: PersistenceManager?) {
+        self.persistenceManager = persistenceManager
     }
 
     func returnRootNavigator() -> UINavigationController {
-        let favoritesVC = FavoritesVC(dbPool: dbPool)
+        let favoritesVC = FavoritesVC()
         favoritesVC.title = favoritesVcTitle
         favoritesVC.favoritesDelegate = self
         let rootNav = UINavigationController(rootViewController: favoritesVC)
@@ -40,45 +40,22 @@ class FavoritesCoordinator {
 
 extension FavoritesCoordinator: FavoritesViewControllerDelegate {
     func selectedImageFromFavoritesVC(imageData: Data, imageTitle: String, imageId: String) {
-        let photoViewerVC = PhotoViewerVC(url: nil, imageTitle: imageTitle, imageId: imageId, imageData: imageData, dbPool: dbPool)
+        let photoViewerVC = PhotoViewerVC(url: nil, imageTitle: imageTitle, imageId: imageId, imageData: imageData, favoritesArray: persistenceManager?.retrieveData())
         photoViewerVC.title = ""
         photoViewerVC.favoritesDelegate = self
         rootNavigationController.pushViewController(photoViewerVC, animated: true)
     }
 
     func getFavoriteImagesFromStorage() -> [FavoriteImageData]? {
-        var favoriteimagesArray: [FavoriteImageData] = []
-        do {
-            try dbPool.read { db in
-                let array = try Row.fetchCursor(db, sql: "SELECT * FROM favorites")
-                while let item = try array.next() {
-                    favoriteimagesArray.append(FavoriteImageData(imageId: item["id"], imageData: item["image"], imageTitle: item["name"]))
-                }
-            }
-            return favoriteimagesArray
-        } catch {
-            return nil
-        }
+        persistenceManager?.retrieveData()
     }
 
     func storeImageAsFavorite(imageData: Data, id: String, title: String) {
-        do {
-            try dbPool.write { db in
-                try db.execute(sql: "INSERT INTO favorites (id, name, image) VALUES (?, ?, ?)", arguments: [id, title, imageData])
-            }
-        } catch {
-            return
-        }
+        persistenceManager?.storeImageIntoDatabase(imageData: imageData, id: id, title: title)
     }
 
     func removeImageFromFavorite(id: String) {
-        do {
-            try dbPool.write { db in
-                try db.execute(sql: "DELETE FROM favorites WHERE id = ? ", arguments: [id])
-            }
-        } catch {
-            return
-        }
+        persistenceManager?.removeImageFromFavorites(id: id)
     }
 }
 

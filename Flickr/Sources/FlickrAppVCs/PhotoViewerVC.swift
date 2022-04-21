@@ -10,13 +10,6 @@ import GRDB
 import Nuke
 import UIKit
 
-protocol FavoritesViewControllerDelegate: AnyObject {
-    func getFavoriteImagesFromStorage() -> [FavoriteImageData]?
-    func selectedImageFromFavoritesVC(imageData: Data, imageTitle: String, imageId: String)
-    func storeImageAsFavorite(imageData: Data, id: String, title: String)
-    func removeImageFromFavorite(id: String)
-}
-
 protocol PhotoViewerViewControllerDelegate: AnyObject {
     func storeImageAsFavorite(imageData: Data, id: String, title: String)
     func removeImageFromFavorites(id: String)
@@ -26,6 +19,7 @@ class PhotoViewerVC: UIViewController {
     private var url: URL?
     private var imageData: Data?
     private var favoriteState: Bool = false
+    private var favoritesArray: [FavoriteImageData]?
     private var imageTitle: String
     private var imageId: String
     private weak var stackView: UIStackView!
@@ -33,9 +27,8 @@ class PhotoViewerVC: UIViewController {
     private weak var favoriteButton: UIButton!
     weak var photoViewerDelegate: PhotoViewerViewControllerDelegate?
     weak var favoritesDelegate: FavoritesViewControllerDelegate?
-    var dbPool: DatabasePool
 
-    init(url: URL?, imageTitle: String, imageId: String, imageData: Data?, dbPool: DatabasePool) {
+    init(url: URL?, imageTitle: String, imageId: String, imageData: Data?, favoritesArray: [FavoriteImageData]?) {
         if url != nil {
             self.url = url
         } else {
@@ -43,14 +36,12 @@ class PhotoViewerVC: UIViewController {
         }
         self.imageTitle = imageTitle
         self.imageId = imageId
-        self.dbPool = dbPool
+        self.favoritesArray = favoritesArray
         super.init(nibName: nil, bundle: nil)
-        let favoritesArray = PersistenceManager.retrieveData(dbPool: dbPool)
-        guard let favoritesArray = favoritesArray else {
-            return
-        }
-        for image in favoritesArray where image.imageId == imageId {
-            favoriteState = true
+        if let favoritesArray = favoritesArray {
+            for image in favoritesArray where image.imageId == imageId {
+                favoriteState = true
+            }
         }
     }
 

@@ -96,7 +96,7 @@ extension PhotosSectionDS: AnimatableSectionModelType, Equatable, IdentifiableTy
     typealias Item = PhotoUrl
 }
 
-struct Favorites: Codable, FetchableRecord, PersistableRecord, TableRecord {
+struct Favorites: Codable, FetchableRecord, PersistableRecord, TableRecord, Identifiable {
     var id: String
     var name: String
     var image: Data

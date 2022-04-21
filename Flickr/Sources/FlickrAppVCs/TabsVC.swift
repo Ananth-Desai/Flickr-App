@@ -12,10 +12,10 @@ import UIKit
 class TabsVC: UITabBarController {
     private var searchCoordinator: SearchTabCoordinator?
     private var favoritesCoordinator: FavoritesCoordinator?
-    var dbPool: DatabasePool
+    var persistenceManager: PersistenceManager?
 
-    init(dbPool: DatabasePool) {
-        self.dbPool = dbPool
+    init(persistenceManager: PersistenceManager?) {
+        self.persistenceManager = persistenceManager
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -34,12 +34,12 @@ class TabsVC: UITabBarController {
         tabBar.backgroundColor = tabbarBackgroundColor
         tabBar.tintColor = tabbarTintColor
 
-        let searchCoordinator = SearchTabCoordinator(dbPool: dbPool)
+        let searchCoordinator = SearchTabCoordinator(persistenceManager: persistenceManager)
         self.searchCoordinator = searchCoordinator
         let searchVC = searchCoordinator.returnRootNavigator()
         searchVC.tabBarItem = UITabBarItem(title: homeVcTitle, image: searchIcon, tag: 0)
 
-        let favoritesCoordinator = FavoritesCoordinator(dbPool: dbPool)
+        let favoritesCoordinator = FavoritesCoordinator(persistenceManager: persistenceManager)
         self.favoritesCoordinator = favoritesCoordinator
         let favoritesVC = favoritesCoordinator.returnRootNavigator()
         favoritesVC.tabBarItem = UITabBarItem(title: favoritesVcTitle, image: favoritesIcon, tag: 0)
