@@ -10,12 +10,12 @@ import GRDB
 import UIKit
 
 class TabsVC: UITabBarController {
-    private var searchCoordinator: SearchTabCoordinator?
-    private var favoritesCoordinator: FavoritesCoordinator?
-    var persistenceManager: PersistenceManager?
+    private var searchCoordinator: SearchTabCoordinator
+    private var favoritesCoordinator: FavoritesCoordinator
 
-    init(persistenceManager: PersistenceManager?) {
-        self.persistenceManager = persistenceManager
+    init(searchCoordinator: SearchTabCoordinator, favoritesCoordinator: FavoritesCoordinator) {
+        self.searchCoordinator = searchCoordinator
+        self.favoritesCoordinator = favoritesCoordinator
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -34,13 +34,9 @@ class TabsVC: UITabBarController {
         tabBar.backgroundColor = tabbarBackgroundColor
         tabBar.tintColor = tabbarTintColor
 
-        let searchCoordinator = SearchTabCoordinator(persistenceManager: persistenceManager)
-        self.searchCoordinator = searchCoordinator
         let searchVC = searchCoordinator.returnRootNavigator()
         searchVC.tabBarItem = UITabBarItem(title: homeVcTitle, image: searchIcon, tag: 0)
 
-        let favoritesCoordinator = FavoritesCoordinator(persistenceManager: persistenceManager)
-        self.favoritesCoordinator = favoritesCoordinator
         let favoritesVC = favoritesCoordinator.returnRootNavigator()
         favoritesVC.tabBarItem = UITabBarItem(title: favoritesVcTitle, image: favoritesIcon, tag: 0)
 

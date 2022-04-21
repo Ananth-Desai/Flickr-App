@@ -14,9 +14,9 @@ class SearchTabCoordinator {
     weak var rootNavigationController: UINavigationController?
     private var searchString: String?
     var favoritesArray: FavoriteImagesArray? = FavoriteImagesArray(array: [])
-    var persistenceManager: PersistenceManager?
+    var persistenceManager: PersistenceManager
 
-    init(persistenceManager: PersistenceManager?) {
+    init(persistenceManager: PersistenceManager) {
         self.persistenceManager = persistenceManager
     }
 
@@ -64,7 +64,7 @@ class SearchTabCoordinator {
 
 extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
     func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String) {
-        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil, favoritesArray: persistenceManager?.retrieveData())
+        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil, favoritesArray: persistenceManager.retrieveData())
         photoViewerVC.title = title
         photoViewerVC.photoViewerDelegate = self
         rootNavigationController?.pushViewController(photoViewerVC, animated: true)
@@ -73,15 +73,15 @@ extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
 
 extension SearchTabCoordinator: PhotoViewerViewControllerDelegate {
     func getFavoriteImagesFromStorage() -> [FavoriteImageData]? {
-        persistenceManager?.retrieveData()
+        persistenceManager.retrieveData()
     }
 
     func storeImageAsFavorite(imageData: Data, id: String, title: String) {
-        persistenceManager?.storeImageIntoDatabase(imageData: imageData, id: id, title: title)
+        persistenceManager.storeImageIntoDatabase(imageData: imageData, id: id, title: title)
     }
 
     func removeImageFromFavorites(id: String) {
-        persistenceManager?.removeImageFromFavorites(id: id)
+        persistenceManager.removeImageFromFavorites(id: id)
     }
 }
 

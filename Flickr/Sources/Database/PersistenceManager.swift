@@ -36,7 +36,7 @@ class PersistenceManager {
     func storeImageIntoDatabase(imageData: Data, id: String, title: String) {
         do {
             try dbPool.write { db in
-                try FavoritesRecords(id: id, name: title, image: imageData).insert(db)
+                try Favorites(id: id, name: title, image: imageData).insert(db)
             }
         } catch {
             return
@@ -46,7 +46,7 @@ class PersistenceManager {
     func removeImageFromFavorites(id: String) {
         do {
             try dbPool.write { db in
-                try FavoritesRecords.filter(Column("id") == id).deleteAll(db)
+                try Favorites.filter(Favorites.CNAMEs.id == id).deleteAll(db)
             }
         } catch {
             return

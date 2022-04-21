@@ -11,9 +11,9 @@ import UIKit
 
 class FavoritesCoordinator {
     weak var rootNavigationController: UINavigationController!
-    var persistenceManager: PersistenceManager?
+    var persistenceManager: PersistenceManager
 
-    init(persistenceManager: PersistenceManager?) {
+    init(persistenceManager: PersistenceManager) {
         self.persistenceManager = persistenceManager
     }
 
@@ -40,22 +40,22 @@ class FavoritesCoordinator {
 
 extension FavoritesCoordinator: FavoritesViewControllerDelegate {
     func selectedImageFromFavoritesVC(imageData: Data, imageTitle: String, imageId: String) {
-        let photoViewerVC = PhotoViewerVC(url: nil, imageTitle: imageTitle, imageId: imageId, imageData: imageData, favoritesArray: persistenceManager?.retrieveData())
+        let photoViewerVC = PhotoViewerVC(url: nil, imageTitle: imageTitle, imageId: imageId, imageData: imageData, favoritesArray: persistenceManager.retrieveData())
         photoViewerVC.title = ""
         photoViewerVC.favoritesDelegate = self
         rootNavigationController.pushViewController(photoViewerVC, animated: true)
     }
 
     func getFavoriteImagesFromStorage() -> [FavoriteImageData]? {
-        persistenceManager?.retrieveData()
+        persistenceManager.retrieveData()
     }
 
     func storeImageAsFavorite(imageData: Data, id: String, title: String) {
-        persistenceManager?.storeImageIntoDatabase(imageData: imageData, id: id, title: title)
+        persistenceManager.storeImageIntoDatabase(imageData: imageData, id: id, title: title)
     }
 
     func removeImageFromFavorite(id: String) {
-        persistenceManager?.removeImageFromFavorites(id: id)
+        persistenceManager.removeImageFromFavorites(id: id)
     }
 }
 

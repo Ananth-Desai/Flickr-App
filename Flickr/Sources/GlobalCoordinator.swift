@@ -30,7 +30,9 @@ class GlobalCoordinator {
 
     func setupRootViewController() {
         // new TabC object and call setup using obj, will be set to window!.setup here
-        let tabsCoordinator = TabsCoordinator(persistenceManager: persistenceMangaer)
-        window?.setupRootViewController(with: tabsCoordinator.setupRootViewController())
+        if let persistenceMangaer = persistenceMangaer {
+            let tabsCoordinator = TabsCoordinator(persistenceManager: persistenceMangaer)
+            window?.setupRootViewController(with: tabsCoordinator.setupRootViewController())
+        }
     }
 }
