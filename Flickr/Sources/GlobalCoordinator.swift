@@ -21,7 +21,9 @@ class GlobalCoordinator {
         self.window = window
         do {
             dbPool = try Persistence.connectToDB()
-            persistenceMangaer = PersistenceManager(dbPool: dbPool!)
+            if let dbPool = dbPool {
+                persistenceMangaer = PersistenceManager(dbPool: dbPool)
+            }
         } catch {
             dbPool = nil
             persistenceMangaer = nil
