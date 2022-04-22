@@ -198,6 +198,7 @@ class SearchScreenVC: UIViewController {
                 case .failure: break
                 }
             }
+            .disposed(by: disposeBag)
     }
 
     private func returnSearchUrl(searchString: String) -> URL? {
