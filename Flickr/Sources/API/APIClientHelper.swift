@@ -27,7 +27,7 @@ struct APIClientHelper {
             QueryParameter(name: "method", value: GlobalConstants.shared.apiMethod),
             QueryParameter(name: "format", value: GlobalConstants.shared.format),
             QueryParameter(name: "nojsoncallback", value: GlobalConstants.shared.noJsonCallback),
-            QueryParameter(name: "api_key", value: GlobalConstants.shared.apiKey),
+            QueryParameter(name: "api_key", value: GlobalConstants.shared.apiKey)
         ])
     }
 }
