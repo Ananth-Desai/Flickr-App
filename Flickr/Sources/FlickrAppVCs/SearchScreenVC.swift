@@ -171,6 +171,7 @@ class SearchScreenVC: UIViewController {
     }
 
     func fetchPhotos(searchString: String) {
+        let callHandler = ApiCallHandler()
         if task?.state == .running {
             task?.cancel()
         }
@@ -179,36 +180,24 @@ class SearchScreenVC: UIViewController {
         imageIDs = []
         imagesLoaded = false
         photoSections[0].emptyPhotosArray()
-        guard let url = returnSearchUrl(searchString: searchString) else {
-            return
-        }
-        task = URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            var result: Photos?
-            do {
-                result = try JSONDecoder().decode(Photos.self, from: data)
-            } catch {
-                return
-            }
-            guard let result = result else {
-                return
-            }
-            photosArray = self.constructIndividualUrls(result)
-            self.photos = photosArray
-            DispatchQueue.main.async { [self] in
-                if let dataSource = dataSource {
-                    Observable.just(photoSections)
-                        .bind(to: collectionView.rx.items(dataSource: dataSource))
-                        .disposed(by: disposeBag)
+        callHandler.fetchRequest(searchString: searchString)
+            .observe(on: MainScheduler.instance)
+            .subscribe { result in
+                switch result {
+                case let .success(response):
+                    photosArray = self.constructIndividualUrls(response)
+                    self.photos = photosArray
+                    if let dataSource = self.dataSource {
+                        Observable.just(self.photoSections)
+                            .bind(to: self.collectionView.rx.items(dataSource: dataSource))
+                            .disposed(by: self.disposeBag)
+                    }
+                    self.progressView.stopAnimating()
+                    self.collectionView.isHidden = false
+                    self.imagesLoaded = true
+                case .failure: break
                 }
-                progressView.stopAnimating()
-                collectionView.isHidden = false
-                imagesLoaded = true
             }
-        })
-        task?.resume()
     }
 
     private func returnSearchUrl(searchString: String) -> URL? {
