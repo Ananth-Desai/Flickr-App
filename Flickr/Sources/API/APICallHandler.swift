@@ -11,6 +11,7 @@ import Sedwig
 
 class ApiCallHandler {
     private var apiClient: AsyncAPIClientRx
+    static var shared = ApiCallHandler()
 
     init() {
         let apiClient = APIClientHelper.getFlickrApiClient()

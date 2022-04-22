@@ -171,7 +171,6 @@ class SearchScreenVC: UIViewController {
     }
 
     func fetchPhotos(searchString: String) {
-        let callHandler = ApiCallHandler()
         if task?.state == .running {
             task?.cancel()
         }
@@ -180,7 +179,7 @@ class SearchScreenVC: UIViewController {
         imageIDs = []
         imagesLoaded = false
         photoSections[0].emptyPhotosArray()
-        callHandler.fetchRequest(searchString: searchString)
+        ApiCallHandler.shared.fetchRequest(searchString: searchString)
             .observe(on: MainScheduler.instance)
             .subscribe { result in
                 switch result {
