@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GRDB
 import RxSwift
 import UIKit
 
@@ -13,6 +14,11 @@ class SearchTabCoordinator {
     weak var rootNavigationController: UINavigationController?
     private var searchString: String?
     var favoritesArray: FavoriteImagesArray? = FavoriteImagesArray(array: [])
+    var persistenceManager: PersistenceManager
+
+    init(persistenceManager: PersistenceManager) {
+        self.persistenceManager = persistenceManager
+    }
 
     private func returnSearchScreenVC() -> UIViewController {
         let searchScreenVC = SearchScreenVC()
@@ -58,7 +64,7 @@ class SearchTabCoordinator {
 
 extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
     func didSelectImage(url: URL, title: String, imageTitle: String, imageId: String) {
-        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil)
+        let photoViewerVC = PhotoViewerVC(url: url, imageTitle: imageTitle, imageId: imageId, imageData: nil, favoritesArray: persistenceManager.retrieveData())
         photoViewerVC.title = title
         photoViewerVC.photoViewerDelegate = self
         rootNavigationController?.pushViewController(photoViewerVC, animated: true)
@@ -66,26 +72,16 @@ extension SearchTabCoordinator: SearchScreenViewControllerDelegate {
 }
 
 extension SearchTabCoordinator: PhotoViewerViewControllerDelegate {
+    func getFavoriteImagesFromStorage() -> [FavoriteImageData]? {
+        persistenceManager.retrieveData()
+    }
+
     func storeImageAsFavorite(imageData: Data, id: String, title: String) {
-        var favorites = FavoriteImagesArray(array: [])
-        let newArray = PersistenceManager.retrieveData() ?? []
-        favorites.array = newArray
-        let image = FavoriteImageData(imageId: id, imageData: imageData, imageTitle: title)
-        favorites.array.append(image)
-        favoritesArray = favorites
-        PersistenceManager.storeData(favoritesArray)
+        persistenceManager.storeImageIntoDatabase(imageData: imageData, id: id, title: title)
     }
 
     func removeImageFromFavorites(id: String) {
-        var newFavoriteArray = FavoriteImagesArray(array: [])
-        guard let favoriteArray = PersistenceManager.retrieveData() else {
-            return
-        }
-        for photo in favoriteArray where photo.imageId != id {
-            newFavoriteArray.array.append(photo)
-        }
-        favoritesArray = newFavoriteArray
-        PersistenceManager.storeData(favoritesArray)
+        persistenceManager.removeImageFromFavorites(id: id)
     }
 }
 

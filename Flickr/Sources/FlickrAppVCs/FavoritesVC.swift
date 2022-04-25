@@ -6,8 +6,16 @@
 //
 
 import Foundation
+import GRDB
 import Nuke
 import UIKit
+
+protocol FavoritesViewControllerDelegate: AnyObject {
+    func getFavoriteImagesFromStorage() -> [FavoriteImageData]?
+    func selectedImageFromFavoritesVC(imageData: Data, imageTitle: String, imageId: String)
+    func storeImageAsFavorite(imageData: Data, id: String, title: String)
+    func removeImageFromFavorite(id: String)
+}
 
 class FavoritesVC: UIViewController {
     weak var favoritesDelegate: FavoritesViewControllerDelegate?
@@ -81,14 +89,14 @@ class FavoritesVC: UIViewController {
 
     private func setupDefaultTextView() -> [NSLayoutConstraint] {
         let textView = UILabel()
-        textView.configureView { textView in
-            textView.text = favoritesDefaultText
-            textView.font = UIFont(name: favoritesDefaultTextFontName, size: favoritesDefaultTextFontSize)
-            textView.textColor = textFieldColor
-            textView.backgroundColor = viewBackgroundColor
-            textView.textAlignment = .center
-            textView.lineBreakMode = .byClipping
-            textView.numberOfLines = textNumberOfLines
+        textView.configureView { tV in
+            tV.text = favoritesDefaultText
+            tV.font = UIFont(name: favoritesDefaultTextFontName, size: favoritesDefaultTextFontSize)
+            tV.textColor = textFieldColor
+            tV.backgroundColor = viewBackgroundColor
+            tV.textAlignment = .center
+            tV.lineBreakMode = .byClipping
+            tV.numberOfLines = textNumberOfLines
         }
         self.textView = textView
         view.addSubview(textView)
@@ -103,10 +111,10 @@ class FavoritesVC: UIViewController {
     func setupCollectionView() -> [NSLayoutConstraint] {
         let collectionViewFlowLayout = returnCollectionViewFlowLayout()
         let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: collectionViewFlowLayout)
-        collectionView.configureView { collectionView in
-            collectionView.delegate = self
-            collectionView.dataSource = self
-            collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
+        collectionView.configureView { [weak self] cV in
+            cV.delegate = self
+            cV.dataSource = self
+            cV.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
         }
         self.collectionView = collectionView
         view.addSubview(collectionView)
@@ -133,10 +141,10 @@ class FavoritesVC: UIViewController {
             return nil
         }
         let imageView = UIImageView(image: UIImage(data: imageData))
-        imageView.configureView { imageView in
-            imageView.tag = 10
-            imageView.contentMode = .scaleAspectFill
-            imageView.clipsToBounds = true
+        imageView.configureView { iV in
+            iV.tag = 10
+            iV.contentMode = .scaleAspectFill
+            iV.clipsToBounds = true
         }
         return imageView
     }

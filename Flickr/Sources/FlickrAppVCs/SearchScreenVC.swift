@@ -23,7 +23,7 @@ class SearchScreenVC: UIViewController {
     private weak var progressView: UIActivityIndicatorView!
     private var photos: [URL] = []
     private var photoSections: [PhotosSectionDS] = [PhotosSectionDS(photos: [])]
-    private var dataSource: RxCollectionViewSectionedAnimatedDataSource<PhotosSectionDS>?
+    private var dataSource: RxCollectionViewSectionedAnimatedDataSource<PhotosSectionDS>!
     private var nextVCTitle: String?
     private var imagesLoaded: Bool = false
     private var clickedCancel: Bool = false
@@ -39,13 +39,13 @@ class SearchScreenVC: UIViewController {
         view.backgroundColor = viewBackgroundColor
         navigationController?.navigationBar.tintColor = navigationBarTintColor
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        setupRxDataSource()
         let textviewConstraints = setupDefaultTextView()
         let progressViewConstraints = setupProgressView()
         let collectionViewConstraints = setupCollectionView()
         NSLayoutConstraint.activate(textviewConstraints + progressViewConstraints + collectionViewConstraints)
         handleCancelButtonSubsciption()
         handleSearchStringSubscription()
-        setupRxDataSource()
     }
 
     private func setupRxDataSource() {
@@ -64,13 +64,13 @@ class SearchScreenVC: UIViewController {
 
     private func setupDefaultTextView() -> [NSLayoutConstraint] {
         let textView = UILabel()
-        textView.configureView { textView in
-            textView.text = searchDefaultText
-            textView.textAlignment = .center
-            textView.lineBreakMode = .byClipping
-            textView.numberOfLines = textNumberOfLines
-            textView.textColor = defaultTextFontColor
-            textView.font = UIFont(name: defaultTextFontName, size: defaultTextFontSize)
+        textView.configureView { tV in
+            tV.text = searchDefaultText
+            tV.textAlignment = .center
+            tV.lineBreakMode = .byClipping
+            tV.numberOfLines = textNumberOfLines
+            tV.textColor = defaultTextFontColor
+            tV.font = UIFont(name: defaultTextFontName, size: defaultTextFontSize)
         }
         self.textView = textView
         view.addSubview(textView)
@@ -95,10 +95,10 @@ class SearchScreenVC: UIViewController {
     private func setupCollectionView() -> [NSLayoutConstraint] {
         let collectionViewFlowLayout = returnCollectionViewFlowLayout()
         let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: collectionViewFlowLayout)
-        collectionView.configureView { collectionView in
-            collectionView.delegate = self
-            collectionView.isHidden = true
-            collectionView.register(CustomCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
+        collectionView.configureView { [weak self] cV in
+            cV.delegate = self
+            cV.isHidden = true
+            cV.register(CustomCollectionViewCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
         }
         self.collectionView = collectionView
         view.addSubview(collectionView)
@@ -112,9 +112,9 @@ class SearchScreenVC: UIViewController {
 
     func setupProgressView() -> [NSLayoutConstraint] {
         let progressView = UIActivityIndicatorView()
-        progressView.configureView { progressView in
-            progressView.stopAnimating()
-            progressView.hidesWhenStopped = true
+        progressView.configureView { pV in
+            pV.stopAnimating()
+            pV.hidesWhenStopped = true
         }
         view.addSubview(progressView)
         self.progressView = progressView
@@ -128,32 +128,36 @@ class SearchScreenVC: UIViewController {
         navigationItem.searchController?.searchBar.rx.text
             .asObservable()
             .debounce(.milliseconds(1000), scheduler: MainScheduler.instance)
-            .subscribe(onNext: { string in
-                if let string = string {
-                    if string.count > 2 {
-                        self.collectionView.isHidden = true
-                        self.progressView.startAnimating()
-                        self.fetchPhotos(searchString: string)
-                        self.nextVCTitle = string
-                        self.textView.isHidden = true
-                        self.clickedCancel = false
-                    } else {
-                        if !self.imagesLoaded {
-                            self.progressView.stopAnimating()
-                            self.textView.isHidden = false
+            .subscribe(onNext: { [weak self] string in
+                if let self = self {
+                    if let string = string {
+                        if string.count > 2 {
                             self.collectionView.isHidden = true
+                            self.progressView.startAnimating()
+                            self.fetchPhotos(searchString: string)
+                            self.nextVCTitle = string
+                            self.textView.isHidden = true
+                            self.clickedCancel = false
                         } else {
-                            if self.clickedCancel {
-                                self.progressView.stopAnimating()
-                                self.textView.isHidden = true
-                                self.collectionView.isHidden = false
-                            } else {
+                            if !self.imagesLoaded {
                                 self.progressView.stopAnimating()
                                 self.textView.isHidden = false
                                 self.collectionView.isHidden = true
+                            } else {
+                                if self.clickedCancel {
+                                    self.progressView.stopAnimating()
+                                    self.textView.isHidden = true
+                                    self.collectionView.isHidden = false
+                                } else {
+                                    self.progressView.stopAnimating()
+                                    self.textView.isHidden = false
+                                    self.collectionView.isHidden = true
+                                }
                             }
                         }
                     }
+                } else {
+                    print("Could not initialize Search Screen View Controller")
                 }
             })
             .disposed(by: disposeBag)
@@ -162,50 +166,43 @@ class SearchScreenVC: UIViewController {
     private func handleCancelButtonSubsciption() {
         navigationItem.searchController?.searchBar.rx.cancelButtonClicked
             .asObservable()
-            .subscribe(onNext: { _ in
-                self.clickedCancel = true
-                self.task?.cancel()
-                self.progressView.stopAnimating()
+            .subscribe(onNext: { [weak self] in
+                if let self = self {
+                    self.clickedCancel = true
+                    self.task?.cancel()
+                    self.progressView.stopAnimating()
+                }
             })
             .disposed(by: disposeBag)
     }
 
     func fetchPhotos(searchString: String) {
+        if task?.state == .running {
+            task?.cancel()
+        }
         var photosArray: [URL] = []
         imageTitles = []
         imageIDs = []
         imagesLoaded = false
         photoSections[0].emptyPhotosArray()
-        guard let url = returnSearchUrl(searchString: searchString) else {
-            return
-        }
-        task = URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            var result: Photos?
-            do {
-                result = try JSONDecoder().decode(Photos.self, from: data)
-            } catch {
-                return
-            }
-            guard let result = result else {
-                return
-            }
-            photosArray = self.constructIndividualUrls(result)
-            self.photos = photosArray
-            DispatchQueue.main.async { [self] in
-                if let dataSource = dataSource {
-                    Observable.just(photoSections)
-                        .bind(to: collectionView.rx.items(dataSource: dataSource))
-                        .disposed(by: disposeBag)
+        ApiCallHandler.shared.fetchRequest(searchString: searchString)
+            .observe(on: MainScheduler.instance)
+            .map { [weak self] photos in
+                if let self = self {
+                    photosArray = self.constructIndividualUrls(photos)
+                    self.photos = photosArray
+                    self.progressView.stopAnimating()
+                    self.collectionView.isHidden = false
+                    self.imagesLoaded = true
+                    return self.photoSections
+                } else {
+                    print("Could not initialize search screen view controller")
+                    return []
                 }
-                progressView.stopAnimating()
-                collectionView.isHidden = false
-                imagesLoaded = true
             }
-        })
-        task?.resume()
+            .asObservable()
+            .bind(to: collectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
     }
 
     private func returnSearchUrl(searchString: String) -> URL? {

@@ -6,10 +6,16 @@
 //
 
 import Foundation
+import GRDB
 import UIKit
 
 class FavoritesCoordinator {
     weak var rootNavigationController: UINavigationController!
+    var persistenceManager: PersistenceManager
+
+    init(persistenceManager: PersistenceManager) {
+        self.persistenceManager = persistenceManager
+    }
 
     func returnRootNavigator() -> UINavigationController {
         let favoritesVC = FavoritesVC()
@@ -34,33 +40,22 @@ class FavoritesCoordinator {
 
 extension FavoritesCoordinator: FavoritesViewControllerDelegate {
     func selectedImageFromFavoritesVC(imageData: Data, imageTitle: String, imageId: String) {
-        let photoViewerVC = PhotoViewerVC(url: nil, imageTitle: imageTitle, imageId: imageId, imageData: imageData)
+        let photoViewerVC = PhotoViewerVC(url: nil, imageTitle: imageTitle, imageId: imageId, imageData: imageData, favoritesArray: persistenceManager.retrieveData())
         photoViewerVC.title = ""
         photoViewerVC.favoritesDelegate = self
         rootNavigationController.pushViewController(photoViewerVC, animated: true)
     }
 
     func getFavoriteImagesFromStorage() -> [FavoriteImageData]? {
-        PersistenceManager.retrieveData()
+        persistenceManager.retrieveData()
     }
 
     func storeImageAsFavorite(imageData: Data, id: String, title: String) {
-        var favorites = FavoriteImagesArray(array: [])
-        favorites.array = PersistenceManager.retrieveData() ?? []
-        let image = FavoriteImageData(imageId: id, imageData: imageData, imageTitle: title)
-        favorites.array.append(image)
-        PersistenceManager.storeData(favorites)
+        persistenceManager.storeImageIntoDatabase(imageData: imageData, id: id, title: title)
     }
 
     func removeImageFromFavorite(id: String) {
-        var newFavoriteArray = FavoriteImagesArray(array: [])
-        guard let favoriteArray = PersistenceManager.retrieveData() else {
-            return
-        }
-        for photo in favoriteArray where photo.imageId != id {
-            newFavoriteArray.array.append(photo)
-        }
-        PersistenceManager.storeData(newFavoriteArray)
+        persistenceManager.removeImageFromFavorites(id: id)
     }
 }
 

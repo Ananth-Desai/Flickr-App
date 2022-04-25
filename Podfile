@@ -9,6 +9,7 @@ target 'Flickr' do
   pod 'RxSwift'
   pod 'RxDataSources'
   pod 'RxCocoa'
+  pod 'GRDB.swift'
   target 'FlickrTests' do
     pod 'libPhoneNumber-iOS', '~> 0.8', :modular_headers => true
   end
