@@ -64,11 +64,11 @@ class PhotoViewerVC: UIViewController {
 
     private func setupStackView() -> [NSLayoutConstraint]? {
         let stackView = UIStackView()
-        stackView.configureView { stackView in
-            stackView.axis = .horizontal
-            stackView.alignment = .fill
-            stackView.distribution = .fill
-            stackView.spacing = stackViewSpacing
+        stackView.configureView { sV in
+            sV.axis = .horizontal
+            sV.alignment = .fill
+            sV.distribution = .fill
+            sV.spacing = stackViewSpacing
         }
         self.stackView = stackView
         view.addSubview(stackView)
@@ -88,10 +88,10 @@ class PhotoViewerVC: UIViewController {
 
     private func returnLabel(stackView: UIStackView?) -> [NSLayoutConstraint]? {
         let label = UILabel()
-        label.configureView { label in
-            label.text = imageTitle
-            label.font = label.font.withSize(labelFontSize)
-            label.clipsToBounds = false
+        label.configureView { lb in
+            lb.text = imageTitle
+            lb.font = lb.font.withSize(labelFontSize)
+            lb.clipsToBounds = false
         }
         if let stackView = stackView {
             stackView.addArrangedSubview(label)
@@ -105,10 +105,14 @@ class PhotoViewerVC: UIViewController {
 
     private func returnIcon(stackView: UIStackView?) -> [NSLayoutConstraint]? {
         let button = UIButton(type: .custom)
-        button.configureView { button in
-            button.setImage(self.favoriteState ? filledHeartIcon?.withRenderingMode(.alwaysTemplate) : outlinedHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
-            button.addTarget(self, action: #selector(clickedFavorite), for: .touchUpInside)
-            button.imageView?.tintColor = favoriteToggleButtonTintColor
+        button.configureView { [weak self] bt in
+            if let self = self {
+                bt.setImage(self.favoriteState ? filledHeartIcon?.withRenderingMode(.alwaysTemplate) : outlinedHeartIcon?.withRenderingMode(.alwaysTemplate), for: .normal)
+                bt.addTarget(self, action: #selector(clickedFavorite), for: .touchUpInside)
+            } else {
+                print("Could not inititalize Photo Viewer View Controller")
+            }
+            bt.imageView?.tintColor = favoriteToggleButtonTintColor
         }
         favoriteButton = button
         if let stackView = stackView {
@@ -122,10 +126,10 @@ class PhotoViewerVC: UIViewController {
 
     private func setupImageView() -> [NSLayoutConstraint]? {
         let imageView = UIImageView()
-        imageView.configureView { imageView in
-            imageView.clipsToBounds = true
-            imageView.contentMode = .scaleAspectFit
-            imageView.backgroundColor = imageViewBackgroundColor
+        imageView.configureView { iV in
+            iV.clipsToBounds = true
+            iV.contentMode = .scaleAspectFit
+            iV.backgroundColor = imageViewBackgroundColor
         }
         self.imageView = imageView
         if url != nil {

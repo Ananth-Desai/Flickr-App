@@ -14,6 +14,7 @@ class CustomCollectionViewCell: UICollectionViewCell {
     var photos: URL?
 
     override func prepareForReuse() {
+        super.prepareForReuse()
         for views in subviews {
             views.removeFromSuperview()
         }
@@ -31,10 +32,10 @@ class CustomCollectionViewCell: UICollectionViewCell {
 
     private func returnImageView() -> UIImageView {
         let imageView = UIImageView()
-        imageView.configureView { imageView in
-            imageView.tag = 10
-            imageView.contentMode = .scaleAspectFill
-            imageView.clipsToBounds = true
+        imageView.configureView { iV in
+            iV.tag = 10
+            iV.contentMode = .scaleAspectFill
+            iV.clipsToBounds = true
         }
         return imageView
     }
@@ -50,8 +51,8 @@ class CustomCollectionViewCell: UICollectionViewCell {
 
     private func returnSpinner() -> [NSLayoutConstraint] {
         let spinner = UIActivityIndicatorView()
-        spinner.configureView { spinner in
-            spinner.startAnimating()
+        spinner.configureView { sp in
+            sp.startAnimating()
         }
         addSubview(spinner)
         return [

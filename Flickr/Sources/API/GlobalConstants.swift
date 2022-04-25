@@ -17,6 +17,7 @@ class GlobalConstants {
     let apiMethod = "flickr.photos.search"
     let format = "json"
     let noJsonCallback = "1"
+    let searchStringParameterName = "text"
 
     func returnSearchUrl(searchString: String) -> URL? {
         URL(string: "\(baseSearchUrl)\(requestPath)/?method=\(apiMethod)&api_key=\(apiKey)&format=\(format)&nojsoncallback=\(noJsonCallback)&text=\(searchString)")

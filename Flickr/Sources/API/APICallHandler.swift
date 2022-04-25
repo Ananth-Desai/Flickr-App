@@ -19,7 +19,7 @@ class ApiCallHandler {
     }
 
     func fetchRequest(searchString: String) -> Single<Photos> {
-        let queryParameters = QueryParameters([QueryParameter(name: "text", value: searchString)])
+        let queryParameters = QueryParameters([QueryParameter(name: GlobalConstants.shared.searchStringParameterName, value: searchString)])
         let request = Request(method: .post, path: GlobalConstants.shared.requestPath, headers: Headers(), queryParameters: queryParameters)
         return apiClient.sendRequest(request).map {
             try self.parserResponse(response: $0)
